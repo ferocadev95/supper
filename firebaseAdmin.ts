@@ -1,21 +1,21 @@
 import { initFirestore } from "@auth/firebase-adapter";
-import admin from "firebase-admin";
-import { getApps } from "firebase-admin/app";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
 const serviceAccount = JSON.parse(
     process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
 );
 
 if (!getApps().length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+    initializeApp({
+        credential: cert(serviceAccount),
     });
 }
 
 // AuthJS adapter
 const firestore = initFirestore({
-    credential: admin.credential.cert(serviceAccount),
+    credential: cert(serviceAccount),
 });
 
-const adminDB = admin.firestore();
+const adminDB = getFirestore();
 export { adminDB, firestore };
