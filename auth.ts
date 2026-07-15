@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import EmailProvider from "next-auth/providers/email";
+import Resend from "next-auth/providers/resend";
 import { FirestoreAdapter } from "@auth/firebase-adapter";
 import { firestore } from "./firebaseAdmin";
 import { sendVerificationRequest } from "./src/lib/send-verification-request";
@@ -11,8 +11,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
-    EmailProvider({
-      server: 465,
+    Resend({
+      apiKey: process.env.AUTH_RESEND_KEY,
       from: "no-reply@registrosupper.store",
       sendVerificationRequest,
     }),
