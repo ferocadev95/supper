@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import cartReducer from "./features/cart/cartSlice";
+import { cartSyncListener } from "./cartSyncListener";
 import {
     persistStore,
     persistReducer,
@@ -63,7 +64,7 @@ export const makeStore = () => {
                         REGISTER,
                     ],
                 },
-            }),
+            }).prepend(cartSyncListener.middleware),
     });
 };
 

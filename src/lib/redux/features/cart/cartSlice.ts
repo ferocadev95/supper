@@ -136,6 +136,11 @@ export const cartSlice = createSlice({
                 (item) => item._id !== action.payload
             );
         },
+        // Replace the whole cart with the server's version (Firestore wins on
+        // load/reload for authenticated users). Excluded from the sync listener.
+        setCart: (state, action: PayloadAction<ProductData[]>) => {
+            state.cartItems = action.payload ?? [];
+        },
         resetCart: (state) => {
             state.cartItems = [];
         },
@@ -160,6 +165,7 @@ export const {
     removeUser,
     addUser,
     addToCartKgQuantity,
+    setCart,
 } = cartSlice.actions;
 
 export const selectItemQuantityById = (state: RootState, itemId: string) =>
