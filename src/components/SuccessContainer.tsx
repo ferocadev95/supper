@@ -14,6 +14,8 @@ import {
 } from "react-icons/hi";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import FormattedPrice from "./FormattedPrice";
+import { computeCartTotals } from "../lib/pricing";
 
 const SuccessContainer = ({
     id,
@@ -28,47 +30,19 @@ const SuccessContainer = ({
     const { data: session } = useSession();
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [shipping, setShipping] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
-
-    const shippingCost = 50;
 
     const shippingMethod = searchParams.get("shipping_method")?.toString();
     const selectedHour = searchParams.get("selected_hour")?.toString();
     const clientId = searchParams.get("client_id")?.toString();
 
+    // Local estimate shown before the server responds; the authoritative total
+    // returned by /api/saveorder replaces it once the order is persisted.
     useEffect(() => {
-        const price = cartItems.reduce((acc, item) => {
-            let itemTotal = 0;
-
-            if (item?.productType === "p") {
-                itemTotal = item.pPrice * item.quantity - (item?.rowprice || 0);
-            } else if (item?.productType === "m-kg") {
-                itemTotal =
-                    (item.matureQuantity || 0) *
-                        (item.kgPrice - (item?.rowprice || 0)) +
-                    (item.greenQuantity || 0) *
-                        (item.kgPrice - (item?.rowprice || 0));
-            } else if (item?.productType === "kg") {
-                itemTotal =
-                    (item.kgPrice - (item?.rowprice || 0)) * item.kgQuantity;
-            } else if (item?.productType === "100g") {
-                itemTotal =
-                    (item.gramsPrice * 10 - (item.rowprice * 10 || 0)) *
-                    item.kgQuantity *
-                    (1 - item.rowprice || 1);
-            }
-
-            return acc + itemTotal;
-        }, 0);
-
-        setTotalAmount(price);
-
-        if (price > 300) {
-            setShipping(0);
-        } else {
-            setShipping(shippingCost);
-        }
+        const { total } = computeCartTotals(
+            cartItems.map((item) => ({ price: item, quantities: item }))
+        );
+        setTotalAmount(total);
     }, [cartItems]);
 
     const handleReservation = async () => {
@@ -98,16 +72,22 @@ const SuccessContainer = ({
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    shipping,
-                    cartItems,
-                    email: session?.user?.email as string,
                     id: id,
-                    totalAmount,
+                    // Only identity + quantities; the server recomputes amounts.
+                    lines: cartItems.map((item) => ({
+                        _id: item._id,
+                        quantity: item.quantity,
+                        matureQuantity: item.matureQuantity,
+                        greenQuantity: item.greenQuantity,
+                        kgQuantity: item.kgQuantity,
+                    })),
                     phoneNumber,
                 }),
             });
             const data = await response.json();
             if (data?.success) {
+                // Reflect exactly what the server charged/saved.
+                if (typeof data.total === "number") setTotalAmount(data.total);
                 dispatch(resetCart());
             } else {
                 throw new Error("Error al guardar el pedido");
@@ -186,6 +166,12 @@ const SuccessContainer = ({
                                     ? error
                                     : "Gracias por tu confianza. Hemos recibido la información de tu pedido y la estamos procesando. Recibirás un e-mail de confirmación dentro de los próximos minutos."}
                             </p>
+                            {!error && totalAmount > 0 && (
+                                <div className="flex items-center justify-center gap-2 text-lg font-semibold text-gray-800">
+                                    <span>Total pagado:</span>
+                                    <FormattedPrice amount={totalAmount} />
+                                </div>
+                            )}
                             {!error && (
                                 <div className="flex flex-wrap gap-4 items-center justify-center">
                                     <Link href={"/"}>

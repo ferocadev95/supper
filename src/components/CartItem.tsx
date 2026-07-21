@@ -8,14 +8,34 @@ import { removeFromCart } from "../lib/redux/features/cart/cartSlice";
 import toast from "react-hot-toast";
 import FormattedPrice from "./FormattedPrice";
 import AddQtyToCartButton from "./AddQtyToCartButton";
+import { PriceFields, computeLineSubtotal } from "../lib/pricing";
 
 interface Props {
     cart: ProductData[];
     item: ProductData;
+    // Canonical (fresh from Sanity) price fields for this line. Falls back to the
+    // item's own stored fields while the fresh price is still loading.
+    price?: PriceFields;
 }
 
-const CartItem = ({ item }: Props) => {
+// Per-unit price shown in the "Precio" column, sourced from canonical prices.
+const unitPrice = (price: PriceFields): number => {
+    const rowprice = price.rowprice || 0;
+    switch (price.productType) {
+        case "p":
+            return price.pPrice - rowprice;
+        case "100g":
+            return price.gramsPrice - rowprice;
+        case "kg":
+        case "m-kg":
+        default:
+            return price.kgPrice - rowprice;
+    }
+};
+
+const CartItem = ({ item, price }: Props) => {
     const dispatch = useDispatch();
+    const effectivePrice: PriceFields = price ?? item;
 
     return (
         <div className="w-full grid grid-cols-5 mb-4 border border-gray-200 py-2">
@@ -42,55 +62,12 @@ const CartItem = ({ item }: Props) => {
             </div>
             <div className="flex col-span-5 md:col-span-3 items-center justify-between py-4 md:py-0 px-4 lg:px-0">
                 <p className="flex w-1/3 items-center text-lg font-semibold">
-                    {item?.productType === "m-kg" && (
-                        <FormattedPrice
-                            amount={item?.kgPrice - (item?.rowprice || 0)}
-                        />
-                    )}
-                    {item?.productType === "p" && (
-                        <FormattedPrice
-                            amount={item?.pPrice - (item?.rowprice || 0)}
-                        />
-                    )}
-                    {item?.productType === "kg" && (
-                        <FormattedPrice
-                            amount={item?.kgPrice - (item?.rowprice || 0)}
-                        />
-                    )}
-                    {item?.productType === "100g" && (
-                        <FormattedPrice
-                            amount={item?.gramsPrice - (item?.rowprice || 0)}
-                        />
-                    )}
+                    <FormattedPrice amount={unitPrice(effectivePrice)} />
                 </p>
                 <div className="w-1/3 flex items-center gap-6 text-lg">
                     {item?.productType === "p" && (
                         <>
                             <AddQtyToCartButton item={item} />
-                            {/* <button
-                                onClick={handleMinus}
-                                disabled={disabled}
-                                className={`w-6 h-6 bg-gray-100 text-sm flex items-center justify-center hover:bg-primaryBlue/10 border-[1px] border-gray-300
-                                ${disabled ? "cursor-not-allowed" : "cursor-pointer hover:border-primaryRed hoverEffect"}
-                            `}
-                            >
-                                <FaMinus />
-                            </button>
-                            <p className="text-sm font-semibold">
-                                {item?.quantity}
-                            </p>
-                            <button
-                                onClick={() => {
-                                    dispatch(increaseQuantity(item?._id));
-                                    toast.success(
-                                        "Se ha agregado una unidad del producto"
-                                    );
-                                    setDisabled(false);
-                                }}
-                                className="w-6 h-6 bg-gray-100 text-sm flex items-center justify-center hover:bg-primaryBlue/10 cursor-pointer border-[1px] border-gray-300 hover:border-primaryRed hoverEffect"
-                            >
-                                <FaPlus />
-                            </button> */}
                         </>
                     )}
                     {item?.productType === "m-kg" && (
@@ -123,49 +100,9 @@ const CartItem = ({ item }: Props) => {
                     )}
                 </div>
                 <div className="w-1/3 flex items-center font-bold text-lg">
-                    {item?.productType === "p" && (
-                        <FormattedPrice
-                            amount={
-                                item?.quantity *
-                                (item?.pPrice - (item?.rowprice || 0))
-                            }
-                        />
-                    )}
-                    {item?.productType === "m-kg" && (
-                        <FormattedPrice
-                            amount={
-                                (item?.matureQuantity
-                                    ? item.matureQuantity *
-                                      (item.kgPrice - (item?.rowprice || 0))
-                                    : 0) +
-                                (item?.greenQuantity
-                                    ? item.greenQuantity *
-                                      (item.kgPrice - (item?.rowprice || 0))
-                                    : 0)
-                            }
-                        />
-                    )}
-                    {item?.productType === "kg" && (
-                        <FormattedPrice
-                            amount={
-                                item?.kgQuantity
-                                    ? item.kgQuantity *
-                                      (item.kgPrice - (item?.rowprice || 0))
-                                    : 0
-                            }
-                        />
-                    )}
-                    {item?.productType === "100g" && (
-                        <FormattedPrice
-                            amount={
-                                item?.kgQuantity
-                                    ? item.kgQuantity *
-                                      (item.gramsPrice * 10 -
-                                          (item?.rowprice * 10 || 0))
-                                    : 0
-                            }
-                        />
-                    )}
+                    <FormattedPrice
+                        amount={computeLineSubtotal(effectivePrice, item)}
+                    />
                 </div>
             </div>
         </div>

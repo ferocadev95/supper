@@ -12,6 +12,8 @@ import Button from "./Button";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { getReservationsData } from "../server/actions/get-reservations-data";
+import { getCartPricing } from "../server/pricing";
+import { PriceFields, computeCartTotals } from "../lib/pricing";
 
 interface Props {
     session?: Session;
@@ -35,8 +37,14 @@ const CartContainer = ({ session }: Props) => {
     const [selectedHour, setSelectedHour] = useState<string>("8:00-9:00");
     const [reservations, setReservations] = useState<Array<Reservation>>();
     const [clientHasReserved, setClientHasReserved] = useState<boolean>(false);
+    const [pricing, setPricing] = useState<Record<string, PriceFields>>({});
     const { cartItems } = useSelector((state: StoreState) => state?.cart);
     const dispatch = useDispatch();
+
+    // Canonical price for a line: fresh from Sanity if loaded, else the stored
+    // snapshot as a fallback while it loads.
+    const priceFor = (item: (typeof cartItems)[number]): PriceFields =>
+        pricing[item._id] ?? item;
 
     // TODO: Possible validation
     const possibleHours = [
@@ -51,57 +59,35 @@ const CartContainer = ({ session }: Props) => {
     ];
     // TODO: Change error handling from checkout for reserve if needed. This with the hours.
 
-    const shippingCost = 50;
     const clientId = session?.user?.id;
 
+    // Fetch fresh canonical prices from Sanity for the items in the cart, so the
+    // displayed price tracks Sanity even if it changed after the item was added.
     useEffect(() => {
-        const price = cartItems.reduce((acc, item) => {
-            let itemTotal = 0;
-
-            if (item?.productType === "p") {
-                itemTotal =
-                    ((item.pPrice || 0) - (item?.rowprice || 0)) *
-                    (item.quantity || 0);
-            } else if (item?.productType === "m-kg") {
-                itemTotal =
-                    (item.matureQuantity || 0) *
-                        ((item.kgPrice || 0) - (item.rowprice || 0)) +
-                    (item.greenQuantity || 0) *
-                        ((item.kgPrice || 0) - (item.rowprice || 0));
-            } else if (item?.productType === "kg") {
-                itemTotal =
-                    (item.kgQuantity || 0) *
-                    ((item.kgPrice || 0) - (item.rowprice || 0));
-            } else if (item?.productType === "100g") {
-                itemTotal =
-                    (item.kgQuantity || 0) *
-                    ((item.gramsPrice * 10 || 0) - (item?.rowprice || 0));
-                // } else if (item?.productType === "m-kg-p") {
-                //     itemTotal =
-                //         ((item.matureQuantity || 0) * (item.kgPrice || 0) +
-                //             (item.greenQuantity || 0) * (item.kgPrice || 0) +
-                //             (item.pPrice || 0) * (item.quantity || 0)) *
-                //         (1 - item.rowprice || 1);
-                // } else if (item?.productType === "kg-p") {
-                //     itemTotal =
-                //         ((item.kgQuantity || 0) * (item.kgPrice || 0) +
-                //             (item.pPrice || 0) * (item.quantity || 0)) *
-                //         (1 - item.rowprice || 1);
-            } else {
-                itemTotal = 0;
-            }
-
-            return acc + itemTotal;
-        }, 0);
-
-        setTotalAmount(price);
-
-        if (price > 300) {
-            setShipping(0);
-        } else {
-            setShipping(shippingCost);
+        const ids = cartItems.map((item) => item._id);
+        if (ids.length === 0) {
+            setPricing({});
+            return;
         }
+        getCartPricing(ids)
+            .then(setPricing)
+            .catch((error) =>
+                console.error("Error fetching cart pricing", error)
+            );
     }, [cartItems]);
+
+    useEffect(() => {
+        const { subtotal, shipping } = computeCartTotals(
+            cartItems.map((item) => ({
+                price: priceFor(item),
+                quantities: item,
+            }))
+        );
+        setTotalAmount(subtotal);
+        setShipping(shipping);
+        // priceFor depends on `pricing`; recompute when either changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cartItems, pricing]);
 
     useEffect(() => {
         const fetchReservationsData = async () => {
@@ -139,14 +125,18 @@ const CartContainer = ({ session }: Props) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                shipping,
-                items: cartItems,
-                email: session?.user?.email,
+                // Only identity + quantities; prices are resolved server-side.
+                lines: cartItems.map((item) => ({
+                    _id: item._id,
+                    quantity: item.quantity,
+                    matureQuantity: item.matureQuantity,
+                    greenQuantity: item.greenQuantity,
+                    kgQuantity: item.kgQuantity,
+                })),
                 zipCode,
                 shippingMethod,
                 pickupLocation,
                 selectedHour,
-                clientId,
             }),
         });
         const { url, error } = await response.json();
@@ -173,6 +163,7 @@ const CartContainer = ({ session }: Props) => {
                                 key={item?._id}
                                 cart={cartItems}
                                 item={item}
+                                price={priceFor(item)}
                             />
                         ))}
                     </div>

@@ -1,6 +1,7 @@
-import { ProductData } from "../../../../types";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { auth } from "../../../../auth";
+import { resolveOrder, SlimLine } from "../../../server/pricing";
 
 const predefinedHours = [
     "9:00-10:00",
@@ -32,17 +33,20 @@ export const POST = async (req: NextRequest) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
     try {
+        // Identity comes from the session, never from the client body.
+        const session = await auth();
+        const email = session?.user?.email;
+        const clientId = session?.user?.id;
+        if (!email || !clientId) {
+            return NextResponse.json(
+                { error: "Debes iniciar sesión para realizar el pago." },
+                { status: 401 }
+            );
+        }
+
         const reqBody = await req.json();
-        const {
-            items,
-            email,
-            shipping,
-            zipCode,
-            shippingMethod,
-            pickupLocation,
-            selectedHour,
-            clientId,
-        } = await reqBody;
+        const { lines, zipCode, shippingMethod, pickupLocation, selectedHour } =
+            reqBody;
 
         if (!zipCode && !pickupLocation) {
             return NextResponse.json(
@@ -68,11 +72,10 @@ export const POST = async (req: NextRequest) => {
         }
 
         if (shippingMethod === "domicilio") {
-            if (!selectedHour || !clientId) {
+            if (!selectedHour) {
                 return NextResponse.json(
                     {
-                        message:
-                            "Se requiere un id de cliente y un horario para la entrega a domicilio.",
+                        error: "Se requiere un horario para la entrega a domicilio.",
                     },
                     { status: 400 }
                 );
@@ -80,70 +83,23 @@ export const POST = async (req: NextRequest) => {
 
             if (!predefinedHours.includes(selectedHour)) {
                 return NextResponse.json(
-                    { message: "Se ha seleccionado una hora inválida." },
+                    { error: "Se ha seleccionado una hora inválida." },
                     { status: 400 }
                 );
             }
         }
 
-        const quantitySelect = (item: ProductData) => {
-            if (item.productType === "p") {
-                return {
-                    quantity: item.quantity || 0,
-                    price:
-                        (item.pPrice - (item?.rowprice || 0)) *
-                        (item.quantity || 0),
-                };
-            } else if (item.productType === "100g") {
-                return {
-                    quantity: item.kgQuantity * 100 || 0,
-                    price:
-                        (item.gramsPrice / 10 - (item?.rowprice / 100 || 0)) *
-                        (item.kgQuantity * 100 || 0),
-                };
-            } else if (item.productType === "kg") {
-                return {
-                    quantity: item.kgQuantity * 100 || 0,
-                    price:
-                        (item.kgPrice / 100 - (item?.rowprice / 100 || 0)) *
-                        (item.kgQuantity * 100 || 0),
-                };
-            } else if (item.productType === "m-kg") {
-                const totalQuantity =
-                    (item.matureQuantity * 100 || 0) +
-                    (item.greenQuantity * 100 || 0);
-                const totalPrice =
-                    (item.kgPrice / 100 - (item?.rowprice / 100 || 0)) *
-                    totalQuantity;
-                return {
-                    quantity: totalQuantity,
-                    price: totalPrice,
-                };
-            } else {
-                return { quantity: 0, price: 0 };
-            }
-        };
-
-        const extractingItems = await items?.map((item: ProductData) => {
-            const { quantity, price } = quantitySelect(item);
-            return {
-                quantity,
-                price_data: {
-                    currency: "mxn",
-                    unit_amount: Math.round((price * 100) / quantity || 1),
-                    product_data: {
-                        name: item?.title,
-                        description: item?.description,
-                    },
-                },
-            };
-        });
+        // Prices, line items and shipping are recomputed from Sanity — the
+        // client's `lines` only carry `_id` + quantities.
+        const { stripeLineItems, shipping } = await resolveOrder(
+            lines as SlimLine[]
+        );
 
         const origin = req.headers.get("origin");
 
-        const session = await stripe.checkout.sessions.create({
+        const stripeSession = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
-            line_items: extractingItems,
+            line_items: stripeLineItems,
             mode: "payment",
             locale: "es",
             phone_number_collection: {
@@ -175,17 +131,13 @@ export const POST = async (req: NextRequest) => {
             ],
         });
 
-        return NextResponse.json({ url: session?.url }, { status: 200 });
+        return NextResponse.json({ url: stripeSession?.url }, { status: 200 });
     } catch (error: unknown) {
         console.error("Checkout Error:", error);
-        return NextResponse.json(
-            {
-                error:
-                    error || "Ha ocurrido un error durante el proceso de pago",
-            },
-            {
-                status: 500,
-            }
-        );
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Ha ocurrido un error durante el proceso de pago";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 };
