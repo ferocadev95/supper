@@ -3,7 +3,7 @@ import Container from "../../../components/Container";
 import googleImage from "../../assets/googleImage.png";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import SignInMailForm from "../../../components/SignInMailForm";
+import CredentialsSignInForm from "../../../components/CredentialsSignInForm";
 
 const SignInPage = async () => {
   const session = await nextAuth();
@@ -35,7 +35,7 @@ const SignInPage = async () => {
             </button>
           </form>
         </div>
-        <SignInMailForm />
+        <CredentialsSignInForm />
       </div>
     </Container>
   );
