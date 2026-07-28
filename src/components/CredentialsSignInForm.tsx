@@ -1,22 +1,45 @@
 "use client";
 
-import React, { useActionState, useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { signInWithCredentials } from "../server/actions/sign-in-action";
-import { AUTH_ACTION_INITIAL } from "../server/actions/auth-state";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 const CredentialsSignInForm = () => {
-    const [state, formAction] = useActionState(
-        signInWithCredentials,
-        AUTH_ACTION_INITIAL
-    );
+    const router = useRouter();
+    const [error, setError] = useState("");
     const [isPending, startTransition] = useTransition();
 
     const submitAction = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        startTransition(() => {
-            formAction(formData);
+        const email = String(formData.get("email") ?? "");
+        const password = String(formData.get("password") ?? "");
+
+        startTransition(async () => {
+            setError("");
+            // Login en cliente: actualiza el SessionProvider al instante para que
+            // el Header (useSession) refleje la sesión sin recargar la página.
+            const res = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+            });
+
+            if (res?.error) {
+                if (res.code === "EmailNotVerified") {
+                    setError(
+                        "Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada."
+                    );
+                } else {
+                    setError("Correo o contraseña incorrectos");
+                }
+                return;
+            }
+
+            // Éxito: navega al inicio y refresca los server components (layout).
+            router.push("/");
+            router.refresh();
         });
     };
 
@@ -58,10 +81,10 @@ const CredentialsSignInForm = () => {
                     placeholder="••••••••"
                 />
 
-                {state?.error && (
+                {error && (
                     <div>
-                        <p className="text-red-500">{state.error}</p>
-                        {state.error.includes("verificar") && (
+                        <p className="text-red-500">{error}</p>
+                        {error.includes("verificar") && (
                             <Link
                                 href="/resend-verification"
                                 className="text-primaryBlue hover:underline text-sm"

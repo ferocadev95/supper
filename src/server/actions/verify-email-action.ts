@@ -1,6 +1,6 @@
 "use server";
 
-import { consumeEmailVerificationToken } from "../../lib/auth/token-store";
+import { verifyEmailToken } from "../../lib/auth/token-store";
 import { markEmailVerified } from "../../lib/auth/users";
 
 export type VerifyEmailResult = { ok: boolean; message: string };
@@ -14,7 +14,7 @@ export const verifyEmail = async (
   }
 
   try {
-    const data = await consumeEmailVerificationToken(token);
+    const data = await verifyEmailToken(token);
     if (!data) {
       return {
         ok: false,
