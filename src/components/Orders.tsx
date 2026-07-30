@@ -80,7 +80,7 @@ const Orders = () => {
               <div key={item?.id}>
                 <Card
                   className={
-                    expandedOrderId === item.id ? "border-primaryRed/30" : ""
+                    expandedOrderId === item.id ? "border-primaryGold/30" : ""
                   }
                 >
                   <CardHeader>
@@ -112,7 +112,7 @@ const Orders = () => {
                       <div className="flex justify-end">
                         <Button
                           onClick={() => toggleDetails(item.id)}
-                          className="bg-primaryBlue hover:bg-primaryBlue/80 md:max-w-52"
+                          className="md:max-w-52"
                         >
                           {expandedOrderId === item.id
                             ? "Esconder detalles"

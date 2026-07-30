@@ -15,7 +15,7 @@ const CancelledPage = () => {
                 </p>
                 <Link
                     href={"/"}
-                    className="bg-primaryBlue hover:bg-primaryBlue/80 px-4 md:px-8 py-2 md:py-3 rounded-full text-white hoverEffect font-semibold"
+                    className="btn-secondary px-4 md:px-8 py-2 md:py-3 rounded-full"
                 >
                     Regresar a Inicio
                 </Link>

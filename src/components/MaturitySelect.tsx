@@ -64,7 +64,7 @@ const MaturitySelect = ({ item }: Props) => {
                     onClick={() => handleSelection("maduro")}
                     className={
                         maturity === "maduro"
-                            ? "px-4 py-2 border-green-500 border-[1px] rounded-md bg-green-50"
+                            ? "px-4 py-2 border-primaryGreen border-[1px] rounded-md bg-primaryGreen/10"
                             : "px-4 py-2 border-gray-300/50 border-[1px] rounded-md bg-gray-50 hover:bg-gray-200 hoverEffect"
                     }
                 >
@@ -74,7 +74,7 @@ const MaturitySelect = ({ item }: Props) => {
                     onClick={() => handleSelection("verde")}
                     className={
                         maturity === "verde"
-                            ? "px-4 py-2 border-green-500 border-[1px] rounded-md bg-green-50"
+                            ? "px-4 py-2 border-primaryGreen border-[1px] rounded-md bg-primaryGreen/10"
                             : "px-4 py-2 border-gray-300/50 border-[1px] rounded-md bg-gray-50 hover:bg-gray-200 hoverEffect"
                     }
                 >
@@ -92,7 +92,7 @@ const MaturitySelect = ({ item }: Props) => {
             />
             <button
                 onClick={handleAddToCart}
-                className="bg-black rounded-full text-white w-full py-3 border-px border-black font-bold hover:bg-black/60 hover:border-black/60 hoverEffect tracking-wide flex items-center justify-center gap-1"
+                className="btn-secondary rounded-full w-full py-3 font-bold tracking-wide"
             >
                 Agregar al carrito
             </button>

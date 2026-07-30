@@ -20,7 +20,7 @@ const Footer = () => {
                 </div>
                 {footerData?.map((item) => (
                     <div key={item?._id}>
-                        <h3 className="text-primaryBlue/90 text-lg font-semibold mb-3">
+                        <h3 className="text-primaryGreen/90 text-lg font-semibold mb-3">
                             {item?.title}
                         </h3>
                         <div className="flex flex-col gap-1">
@@ -29,7 +29,7 @@ const Footer = () => {
                                     <Link
                                         href={data.link}
                                         key={data.name}
-                                        className="py-1 text-black font-medium hover:text-primaryRed hoverEffect"
+                                        className="py-1 text-black font-medium hover:text-primaryGold hoverEffect"
                                     >
                                         {data.name}
                                     </Link>
@@ -57,7 +57,7 @@ const Footer = () => {
                     </span>
                 </div>
                 <span className="text-gray-600 text-sm tracking-wide">
-                    © Copyright 2024 Supper, Todos los derechos reservados
+                    © Copyright 2024 Frutivida, Todos los derechos reservados
                 </span>
             </div>
         </footer>

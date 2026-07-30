@@ -18,7 +18,7 @@ const Banner = async () => {
                     <div className="flex mt-8 lg:mt-0 flex-col gap-1">
                         <div className="flex items-center gap-1">
                             <span className="text-gray-600">Desde</span>
-                            <div className="bg-green-500 text-white rounded-full w-20 py-1 text-sm font-semibold">
+                            <div className="bg-primaryGreenDark text-white rounded-full w-20 py-1 text-sm font-semibold">
                                 <FormattedPrice
                                     amount={firstBanner?.price}
                                     className="text-center text-sm"
@@ -38,7 +38,7 @@ const Banner = async () => {
                     </div>
                     <Link
                         href={"/productos"}
-                        className="bg-primaryRed mb-0 md:mb-8 lg:mb-0 hover:bg-red-400 hoverEffect text-white rounded-full md:px-8 px-4 text-center font-semibold w-44 py-2.5 text-sm"
+                        className="btn-primary mb-0 md:mb-8 lg:mb-0 rounded-full md:px-8 px-4 w-44 py-2.5 text-sm"
                     >
                         Comprar Ahora
                     </Link>
@@ -53,7 +53,7 @@ const Banner = async () => {
                 />
             </div>
             {/* Right Half - single image */}
-            <div className="flex flex-col space-y-3 md:space-y-5 h-auto md:max-h-[500px] group relative bg-primaryBlue rounded-2xl">
+            <div className="flex flex-col space-y-3 md:space-y-5 h-auto md:max-h-[500px] group relative bg-gradient-to-br from-primaryGreen to-primaryGreenDark rounded-2xl">
                 <div className="h-full overflow-hidden flex justify-center items-start p-10 sm:p-5">
                     <div className="w-full absolute left-10 z-10">
                         <div className="w-1/2 flex flex-col">
@@ -64,16 +64,16 @@ const Banner = async () => {
                                 {secondBanner?.subtitle}
                             </p>
                         </div>
-                        <p className="text-white/60 my-3 max-w-32 font-medium bg-primaryBlue">
+                        <p className="text-white/70 my-3 max-w-32 font-medium">
                             Desde{" "}
                             <FormattedPrice
                                 amount={secondBanner?.price}
-                                className="text-primaryYellow font-bold"
+                                className="text-primaryGold font-bold"
                             />
                         </p>
                         <Link
                             href={"/producto/manzana-roja"}
-                            className=" text-white rounded-full px-4 py-1 bg-blue-700/80 text-sm border-blue-600 border-[1px] hoverEffect hover:bg-blue-600"
+                            className="rounded-full px-4 py-1 text-sm w-fit bg-white text-primaryGreenDark font-semibold hover:bg-white/90 hoverEffect"
                         >
                             Ver Ahora
                         </Link>

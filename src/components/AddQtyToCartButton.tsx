@@ -54,8 +54,8 @@ const AddQtyToCartButton = ({ item }: Props) => {
             <button
                 onClick={handleMinus}
                 disabled={disabled}
-                className={`w-6 h-6 bg-gray-100 text-sm flex items-center justify-center hover:bg-primaryBlue/10 border-[1px] border-gray-300  
-                                    ${disabled ? "cursor-not-allowed" : "cursor-pointer hover:border-primaryRed hoverEffect"}
+                className={`w-6 h-6 bg-gray-100 text-sm flex items-center justify-center hover:bg-primaryGreen/10 border-[1px] border-gray-300  
+                                    ${disabled ? "cursor-not-allowed" : "cursor-pointer hover:border-primaryGold hoverEffect"}
                                 `}
             >
                 <FaMinus />
@@ -63,7 +63,7 @@ const AddQtyToCartButton = ({ item }: Props) => {
             <p className="text-sm font-semibold">{itemQuantity}</p>
             <button
                 onClick={handleAdd}
-                className="w-6 h-6 bg-gray-100 text-sm flex items-center justify-center hover:bg-primaryBlue/10 cursor-pointer border-[1px] border-gray-300 hover:border-primaryRed hoverEffect"
+                className="w-6 h-6 bg-gray-100 text-sm flex items-center justify-center hover:bg-primaryGreen/10 cursor-pointer border-[1px] border-gray-300 hover:border-primaryGold hoverEffect"
             >
                 <FaPlus />
             </button>

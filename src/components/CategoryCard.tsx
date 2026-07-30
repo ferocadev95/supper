@@ -33,7 +33,7 @@ const CategoryCard = ({ categories }: Props) => {
                             </p>
                             <Link
                                 href={`/productos?categoria=${category?.slug?.current}`}
-                                className="inline-block w-full text-center font-semibold bg-black text-white px-4 py-2 hover:bg-black/50 hoverEffect"
+                                className="btn-secondary w-full text-center font-semibold px-4 py-2"
                             >
                                 Ver Categoría
                             </Link>
@@ -61,7 +61,7 @@ const CategoryCard = ({ categories }: Props) => {
                             </p>
                             <Link
                                 href={`/productos?categoria=${category?.slug?.current}`}
-                                className="inline-block w-full text-center font-semibold bg-black text-white px-4 py-2 hover:bg-black/50 hoverEffect"
+                                className="btn-secondary w-full text-center font-semibold px-4 py-2"
                             >
                                 Ver Categoría
                             </Link>

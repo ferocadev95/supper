@@ -54,14 +54,14 @@ const ResendVerificationForm = () => {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="bg-primaryRed hover:bg-red-400 hoverEffect px-4 py-3 rounded-full text-white font-semibold mt-5 disabled:bg-primaryRed/80 disabled:cursor-not-allowed"
+                    className="btn-primary px-4 py-3 rounded-full mt-5 disabled:cursor-not-allowed"
                 >
                     {isPending ? "Enviando..." : "Reenviar correo"}
                 </button>
             </form>
 
             <p className="text-sm mt-1">
-                <Link href="/sign-in" className="text-primaryBlue hover:underline">
+                <Link href="/sign-in" className="text-primaryGreen hover:underline">
                     Volver a iniciar sesión
                 </Link>
             </p>

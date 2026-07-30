@@ -49,7 +49,7 @@ const AddKgToCartButton = ({ item }: Props) => {
             />
             <button
                 onClick={handleAddToCart}
-                className="bg-black rounded-full text-white w-full py-3 border-px border-black font-bold hover:bg-black/60 hover:border-black/60 hoverEffect tracking-wide flex items-center justify-center gap-1"
+                className="btn-secondary rounded-full w-full py-3 font-bold tracking-wide"
             >
                 Agregar al carrito
             </button>

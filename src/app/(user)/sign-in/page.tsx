@@ -28,7 +28,7 @@ const SignInPage = async () => {
           >
             <button
               type="submit"
-              className="flex items-center justify-center w-full border border-blue-500 font-semibold bg-blue-50 px-4 py-1.5 hover:bg-blue-800 hover:text-white hoverEffect rounded-md"
+              className="flex items-center justify-center w-full border border-primaryGreen font-semibold bg-primaryGreen/10 px-4 py-1.5 hover:bg-primaryGreen hover:text-white hoverEffect rounded-md"
             >
               <Image src={googleImage} alt="google-logo" className="w-8 mr-2" />
               <p>Iniciar sesión con Google</p>

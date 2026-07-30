@@ -169,7 +169,7 @@ const CartContainer = ({ session }: Props) => {
                     </div>
                     <button
                         onClick={handleResetCart}
-                        className="py-3 px-10 bg-black hover:bg-black/60 hoverEffect text-white font-semibold uppercase mb-4 text-sm"
+                        className="py-3 px-10 bg-gray-200 text-gray-700 hover:bg-gray-300 hoverEffect font-semibold uppercase mb-4 text-sm rounded-full"
                     >
                         Limpiar carrito
                     </button>
@@ -203,7 +203,7 @@ const CartContainer = ({ session }: Props) => {
                                         onClick={() => {
                                             setShippingMethod("domicilio");
                                         }}
-                                        className={`px-6 py-3 font-semibold text-gray-700 border-[1px] rounded-md hoverEffect ${shippingMethod === "domicilio" ? "border-primaryBlue bg-blue-100" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
+                                        className={`px-6 py-3 font-semibold text-gray-700 border-[1px] rounded-md hoverEffect ${shippingMethod === "domicilio" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
                                     >
                                         A Domicilio
                                     </button>
@@ -211,7 +211,7 @@ const CartContainer = ({ session }: Props) => {
                                         onClick={() => {
                                             setShippingMethod("pickup");
                                         }}
-                                        className={`px-6 py-3 font-semibold border-[1px] rounded-md text-gray-700 hoverEffect ${shippingMethod === "pickup" ? "border-primaryBlue bg-blue-100" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
+                                        className={`px-6 py-3 font-semibold border-[1px] rounded-md text-gray-700 hoverEffect ${shippingMethod === "pickup" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
                                     >
                                         Pick & Go
                                     </button>
@@ -236,7 +236,7 @@ const CartContainer = ({ session }: Props) => {
                                                 }}
                                                 disabled={!session?.user}
                                                 key={item.value}
-                                                className={`px-3 py-1 border-[1px] disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-300/50 disabled:text-gray-400 text-gray-700 hoverEffect font-semibold rounded-md ${selectedHour === item.value ? "border-green-500 bg-green-100" : "bg-gray-100 border-gray-300/50"}`}
+                                                className={`px-3 py-1 border-[1px] disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-300/50 disabled:text-gray-400 text-gray-700 hoverEffect font-semibold rounded-md ${selectedHour === item.value ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50"}`}
                                             >
                                                 {item.hour}
                                             </button>
@@ -291,7 +291,7 @@ const CartContainer = ({ session }: Props) => {
                                                 setPickupLocation("Bona")
                                             }
                                             disabled={!session?.user}
-                                            className={`border-[1px] font-semibold disabled:text-gray-400 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-300/50 px-4 py-3 rounded-md text-gray-700 hoverEffect ${pickupLocation === "Bona" ? "border-green-500 bg-green-100" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
+                                            className={`border-[1px] font-semibold disabled:text-gray-400 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-300/50 px-4 py-3 rounded-md text-gray-700 hoverEffect ${pickupLocation === "Bona" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
                                         >
                                             Plaza Bona
                                         </button>
@@ -300,7 +300,7 @@ const CartContainer = ({ session }: Props) => {
                                                 setPickupLocation("Parroquia")
                                             }
                                             disabled={!session?.user}
-                                            className={`border-[1px] font-semibold disabled:cursor-not-allowed disabled:text-gray-400 disabled:border-gray-300/50 disabled:bg-gray-100 px-4 py-3 rounded-md text-gray-700 hoverEffect ${pickupLocation === "Parroquia" ? "border-green-500 bg-green-100" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
+                                            className={`border-[1px] font-semibold disabled:cursor-not-allowed disabled:text-gray-400 disabled:border-gray-300/50 disabled:bg-gray-100 px-4 py-3 rounded-md text-gray-700 hoverEffect ${pickupLocation === "Parroquia" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
                                         >
                                             Parroquia de San Fernando
                                         </button>
@@ -342,7 +342,7 @@ const CartContainer = ({ session }: Props) => {
                                             (Array.isArray(reservations) &&
                                                 reservations.length >= 2)))
                                 }
-                                className="py-3 px-8 disabled:bg-primaryRed/40"
+                                className="py-3 px-8"
                                 onClick={handleCheckout}
                             >
                                 Proceder al Pago
@@ -374,7 +374,7 @@ const CartContainer = ({ session }: Props) => {
                         </p>
                         <Link
                             href={"/"}
-                            className="bg-primaryRed text-white hover:bg-red-400 hoverEffect px-8 py-3 rounded-full font-semibold"
+                            className="btn-primary px-8 py-3 rounded-full"
                         >
                             Comprar Ahora
                         </Link>

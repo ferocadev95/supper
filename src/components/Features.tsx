@@ -34,7 +34,7 @@ const Features = () => {
                     key={feature?.title}
                     className="flex flex-col sm:flex-row items-center gap-3"
                 >
-                    <span className="text-3xl text-primaryRed">
+                    <span className="text-3xl text-primaryGold">
                         {feature?.icon}
                     </span>
                     <div className="text-center sm:text-left">

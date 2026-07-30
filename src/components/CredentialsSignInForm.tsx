@@ -87,7 +87,7 @@ const CredentialsSignInForm = () => {
                         {error.includes("verificar") && (
                             <Link
                                 href="/resend-verification"
-                                className="text-primaryBlue hover:underline text-sm"
+                                className="text-primaryGreen hover:underline text-sm"
                             >
                                 Reenviar correo de verificación
                             </Link>
@@ -98,7 +98,7 @@ const CredentialsSignInForm = () => {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="bg-primaryRed hover:bg-red-400 hoverEffect px-4 py-3 rounded-full text-white font-semibold mt-5 disabled:bg-primaryRed/80 disabled:cursor-not-allowed"
+                    className="btn-primary px-4 py-3 rounded-full mt-5 disabled:cursor-not-allowed"
                 >
                     {isPending ? "Iniciando..." : "Iniciar sesión"}
                 </button>
@@ -107,11 +107,11 @@ const CredentialsSignInForm = () => {
             <div className="flex justify-between text-sm mt-1">
                 <Link
                     href="/forgot-password"
-                    className="text-primaryBlue hover:underline"
+                    className="text-primaryGreen hover:underline"
                 >
                     ¿Olvidaste tu contraseña?
                 </Link>
-                <Link href="/sign-up" className="text-primaryBlue hover:underline">
+                <Link href="/sign-up" className="text-primaryGreen hover:underline">
                     Crear cuenta
                 </Link>
             </div>

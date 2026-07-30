@@ -25,7 +25,7 @@ const MobileNavBar = ({ session }: Props) => {
           onClick={toggleMenu}
           aria-label="Toggle Menu"
         >
-          <HiMenuAlt2 className="text-2xl hover:text-primaryRed hoverEffect" />
+          <HiMenuAlt2 className="text-2xl hover:text-primaryGold hoverEffect" />
         </button>
         <nav
           className={`absolute top-24 left-0 w-full bg-white border-y-[1px] border-gray-300/50 p-4 transition-all duration-300 transform ${
@@ -67,7 +67,7 @@ const MobileNavBar = ({ session }: Props) => {
             {session?.user && (
               <Link
                 href="/pedidos"
-                className="navBarItem inline-flex border-[1px] px-2 py-2 rounded-md border-gray-300 hover:text-white hover:bg-primaryBlue"
+                className="navBarItem inline-flex border-[1px] px-2 py-2 rounded-md border-gray-300 hover:text-white hover:bg-primaryGreen"
                 onClick={toggleMenu}
               >
                 Mis Pedidos

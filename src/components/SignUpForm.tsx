@@ -96,7 +96,7 @@ const SignUpForm = () => {
                 <button
                     type="submit"
                     disabled={isPending || !!state?.success}
-                    className="bg-primaryRed hover:bg-red-400 hoverEffect px-4 py-3 rounded-full text-white font-semibold mt-5 disabled:bg-primaryRed/80 disabled:cursor-not-allowed"
+                    className="btn-primary px-4 py-3 rounded-full mt-5 disabled:cursor-not-allowed"
                 >
                     {isPending ? "Creando cuenta..." : "Registrarme"}
                 </button>
@@ -104,7 +104,7 @@ const SignUpForm = () => {
 
             <p className="text-sm mt-1">
                 ¿Ya tienes cuenta?{" "}
-                <Link href="/sign-in" className="text-primaryBlue hover:underline">
+                <Link href="/sign-in" className="text-primaryGreen hover:underline">
                     Inicia sesión
                 </Link>
             </p>

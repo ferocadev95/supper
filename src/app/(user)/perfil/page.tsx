@@ -12,7 +12,7 @@ const ProfilePage = async () => {
 
   return (
     <Container className="py-10 min-h-[70vh]">
-      <h2 className="text-2xl font-semibold">Mi Perfil</h2>
+      <h2 className="text-2xl font-semibold accent-bar">Mi Perfil</h2>
       <div className="flex items-center gap-3 my-5">
         <div>
           <p>{session?.user?.name}</p>

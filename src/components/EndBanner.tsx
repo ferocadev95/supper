@@ -27,7 +27,7 @@ const EndBanner = async () => {
             {/* Call to Action */}
             <Link
               href={"/productos?categoria=frutas-y-verduras"}
-              className="mt-8 inline-flex items-center rounded-full bg-primaryRed px-8 py-3 text-sm font-semibold text-white hover:bg-red-400 hoverEffect"
+              className="btn-primary mt-8 rounded-full px-8 py-3 text-sm"
             >
               Ver Frutas y Verduras
             </Link>

@@ -176,7 +176,7 @@ const SidebarProducts = () => {
                             <label className="flex items-center cursor-pointer group">
                                 <input
                                     type="checkbox"
-                                    className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 hoverEffect"
+                                    className="form-checkbox h-5 w-5 text-primaryGreen rounded focus:ring-primaryGreen border-gray-300 hoverEffect"
                                     value={category.value}
                                     checked={
                                         category.value === selectedCategory
@@ -185,7 +185,7 @@ const SidebarProducts = () => {
                                         handleCategoryChange(category.value)
                                     }
                                 />
-                                <span className="ml-3 text-gray-700 group-hover:text-primaryBlue hoverEffect">
+                                <span className="ml-3 text-gray-700 group-hover:text-primaryGreen hoverEffect">
                                     {category.label}
                                 </span>
                             </label>
@@ -210,9 +210,9 @@ const SidebarProducts = () => {
                                     onChange={() =>
                                         handleBrandChange(brand.value)
                                     }
-                                    className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 hoverEffect"
+                                    className="form-checkbox h-5 w-5 text-primaryGreen rounded focus:ring-primaryGreen border-gray-300 hoverEffect"
                                 />
-                                <span className="ml-3 text-gray-700 group-hover:text-blue-600 hoverEffect">
+                                <span className="ml-3 text-gray-700 group-hover:text-primaryGreen hoverEffect">
                                     {brand.label}
                                 </span>
                             </label>
@@ -235,9 +235,9 @@ const SidebarProducts = () => {
                                 onChange={() => {
                                     handleOffersChange(selectedOffers);
                                 }}
-                                className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 hoverEffect"
+                                className="form-checkbox h-5 w-5 text-primaryGreen rounded focus:ring-primaryGreen border-gray-300 hoverEffect"
                             />
-                            <span className="ml-3 text-gray-700 group-hover:text-blue-600 transition duration-150 ease-in-out">
+                            <span className="ml-3 text-gray-700 group-hover:text-primaryGreen transition duration-150 ease-in-out">
                                 {otherFilter.options[0].label}
                             </span>
                         </label>
@@ -250,9 +250,9 @@ const SidebarProducts = () => {
                                 onChange={() => {
                                     handleBestSellerChange(selectedBestSeller);
                                 }}
-                                className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 hoverEffect"
+                                className="form-checkbox h-5 w-5 text-primaryGreen rounded focus:ring-primaryGreen border-gray-300 hoverEffect"
                             />
-                            <span className="ml-3 text-gray-700 group-hover:text-blue-600 transition duration-150 ease-in-out">
+                            <span className="ml-3 text-gray-700 group-hover:text-primaryGreen transition duration-150 ease-in-out">
                                 {otherFilter.options[1].label}
                             </span>
                         </label>

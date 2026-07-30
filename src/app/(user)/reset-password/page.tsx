@@ -22,7 +22,7 @@ const ResetPasswordPage = async ({ searchParams }: ResetPasswordPageProps) => {
             </p>
             <Link
               href="/forgot-password"
-              className="text-primaryBlue hover:underline"
+              className="text-primaryGreen hover:underline"
             >
               Solicitar un nuevo enlace
             </Link>

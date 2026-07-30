@@ -4,7 +4,7 @@ import Orders from "../../../components/Orders";
 const OrdersPage = () => {
     return (
         <Container className="py-10 min-h-[70vh]">
-            <h2 className="text-2xl font-semibold">Mis Pedidos</h2>
+            <h2 className="text-2xl font-semibold accent-bar">Mis Pedidos</h2>
             <Orders />
         </Container>
     );

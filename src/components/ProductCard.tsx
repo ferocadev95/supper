@@ -27,11 +27,11 @@ const ProductCard = ({ item }: { item: ProductData }) => {
             </Link>
             <div className="px-6 flex flex-col items-center gap-2">
                 {item?.brand ? (
-                    <p className="uppercase text-xs font-medium text-primaryRed mt-4">
+                    <p className="uppercase text-xs font-medium text-primaryGold mt-4">
                         {item.brand}
                     </p>
                 ) : (
-                    <p className="uppercase text-xs font-medium text-primaryRed mt-4">
+                    <p className="uppercase text-xs font-medium text-primaryGold mt-4">
                         Por definir
                     </p>
                 )}

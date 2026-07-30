@@ -33,7 +33,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
                     <p className="text-green-500">{state.success}</p>
                     <Link
                         href="/sign-in"
-                        className="bg-primaryRed hover:bg-red-400 hoverEffect px-4 py-3 rounded-full text-white font-semibold mt-2 text-center"
+                        className="btn-primary px-4 py-3 rounded-full mt-2 text-center"
                     >
                         Iniciar sesión
                     </Link>
@@ -85,7 +85,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
                     <button
                         type="submit"
                         disabled={isPending}
-                        className="bg-primaryRed hover:bg-red-400 hoverEffect px-4 py-3 rounded-full text-white font-semibold mt-5 disabled:bg-primaryRed/80 disabled:cursor-not-allowed"
+                        className="btn-primary px-4 py-3 rounded-full mt-5 disabled:cursor-not-allowed"
                     >
                         {isPending ? "Guardando..." : "Cambiar contraseña"}
                     </button>

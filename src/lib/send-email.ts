@@ -4,7 +4,7 @@ import { ResetPasswordTemplate } from "../components/emails/ResetPasswordTemplat
 
 // Remitente configurable. En dev, sin dominio verificado en Resend, usa
 // EMAIL_FROM="onboarding@resend.dev" (solo envía a tu propio correo de Resend).
-const FROM = process.env.EMAIL_FROM || "no-reply@registrosupper.store";
+const FROM = process.env.EMAIL_FROM || "no-reply@registrofrutivida.store";
 
 // URL base de la app para construir los enlaces de los correos.
 function baseUrl(): string {
@@ -33,7 +33,7 @@ export async function sendVerificationEmail(
   const { error } = await resend.emails.send({
     from: FROM,
     to: email,
-    subject: "Verifica tu cuenta - Supper",
+    subject: "Verifica tu cuenta - Frutivida",
     react: VerifyEmailTemplate({ verifyUrl }),
   });
 
@@ -54,7 +54,7 @@ export async function sendPasswordResetEmail(
   const { error } = await resend.emails.send({
     from: FROM,
     to: email,
-    subject: "Restablecer contraseña - Supper",
+    subject: "Restablecer contraseña - Frutivida",
     react: ResetPasswordTemplate({ resetUrl }),
   });
 

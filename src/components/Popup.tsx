@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import Image from "next/image";
-import LogoImage from "../app/assets/logo-supper-transparente.png";
+import LogoImage from "../app/assets/logo-frutivida-transparente.png";
 import { getBannersData } from "../lib/getData";
 import { urlFor } from "../sanity/lib/image";
 import { BannerData } from "../../types";
@@ -66,13 +66,13 @@ const Popup = () => {
                     onClick={handleClose}
                     aria-label="Close popup"
                 >
-                    <IoCloseCircle className="text-3xl hover:text-primaryRed hoverEffect" />
+                    <IoCloseCircle className="text-3xl hover:text-primaryGold hoverEffect" />
                 </button>
                 <div className="flex flex-col md:flex-row items-center gap-3 mt-2">
                     <div className="flex items-center flex-col gap-y-3">
                         <Image
                             src={LogoImage}
-                            alt="Logo Supper Grande"
+                            alt="Logo Frutivida Grande"
                             width={200}
                             height={200}
                         />

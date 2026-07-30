@@ -6,8 +6,8 @@ const TerminosYCondicionesPage = () => {
             </h1>
             <p>
                 La siguiente información rige el uso de los canales de venta
-                digital de Supper que están a disposición de todos nuestros
-                clientes, siendo: el sitio web https://supper.com.mx/.
+                digital de Frutivida que están a disposición de todos nuestros
+                clientes, siendo: el sitio web https://frutivida.com.mx/.
             </p>
             <h2 className="font-bold text-2xl">DEL SITIO</h2>
             <p>
@@ -15,9 +15,9 @@ const TerminosYCondicionesPage = () => {
                 términos y condiciones que rigen el uso de este sitio (en lo
                 sucesivo, “Términos y Condiciones”), ya que al Ingresar y
                 utilizar este sitio de internet, cuyo nombre de dominio es
-                https://supper.com.mx/ (en lo sucesivo, “Sitio”), propiedad de ,
+                https://frutivida.com.mx/ (en lo sucesivo, “Sitio”), propiedad de ,
                 CORPORATIVO ADK SISTEMAS Y SERVICIOS S.A. de C.V. (en lo
-                sucesivo, “Supper”) y usted (en lo sucesivo, “Cliente”) está
+                sucesivo, “Frutivida”) y usted (en lo sucesivo, “Cliente”) está
                 aceptando expresamente los Términos y Condiciones.
             </p>
             <p>
@@ -25,7 +25,7 @@ const TerminosYCondicionesPage = () => {
                 Condiciones, no deberá ingresar y utilizar el Sitio.
             </p>
             <p>
-                Supper podrá, en cualquier momento, actualizar los Términos y
+                Frutivida podrá, en cualquier momento, actualizar los Términos y
                 Condiciones, por lo que el Cliente tendrá la responsabilidad de
                 asegurarse de que cada vez que ingrese y utilice el Sitio,
                 conozca los Términos y Condiciones que estén vigentes. <br />
@@ -43,7 +43,7 @@ const TerminosYCondicionesPage = () => {
             <h2 className="font-bold text-2xl">LICENCIA DE USO</h2>
             <p>
                 En virtud de la aceptación de los Términos y Condiciones por
-                parte del Cliente, Supper otorga y concede al Cliente el derecho
+                parte del Cliente, Frutivida otorga y concede al Cliente el derecho
                 no exclusivo, revocable y no transferible de usar el Sitio, de
                 conformidad con lo estipulado en los Términos y Condiciones.
             </p>
@@ -56,7 +56,7 @@ const TerminosYCondicionesPage = () => {
             </p>
             <p>
                 Cuando la conducta del Cliente sea contraria a los intereses de
-                Supper, éste se reserva el derecho de negar el servicio,
+                Frutivida, éste se reserva el derecho de negar el servicio,
                 cancelar envíos y finiquitar cuentas a su nombre.
             </p>
             <h2 className="font-bold text-2xl">USO DEL SITIO</h2>
@@ -64,16 +64,16 @@ const TerminosYCondicionesPage = () => {
                 Toda la información de registro y facturación proporcionada por
                 el Cliente deberá ser verdadera y exacta; proporcionar cualquier
                 información falsa o inexacta constituye el incumplimiento de
-                estos Términos y Condiciones. Al momento de que Supper confirma
+                estos Términos y Condiciones. Al momento de que Frutivida confirma
                 la orden de compra que generé el Cliente (en adelante,
                 “Pedido”), éste está de acuerdo en aceptar y pagar por los
-                productos y/o mercancía que comercializa Supper por medio del
+                productos y/o mercancía que comercializa Frutivida por medio del
                 Sitio (en adelante, “Producto”), así como los datos de
-                facturación proporcionados a Supper.
+                facturación proporcionados a Frutivida.
             </p>
             <p>
                 Las violaciones al Sitio o red de seguridad pueden dar lugar a
-                responsabilidad civil o penal. Supper podrá investigar cualquier
+                responsabilidad civil o penal. Frutivida podrá investigar cualquier
                 situación que pueda involucrar tales violaciones, así como
                 cooperar con las autoridades en lo que éstas le soliciten.
                 Haciendo uso del Sitio, el Cliente se obliga a no utilizar
@@ -93,7 +93,7 @@ const TerminosYCondicionesPage = () => {
                 mediante el código del Producto respectivo (UPC).
             </p> */}
             <p>
-                Supper exhibe con precisión los colores de los Productos que
+                Frutivida exhibe con precisión los colores de los Productos que
                 aparecen en el Sitio, así como de las fotografías que le
                 proporcionen los proveedores o cualquier tercero y que se
                 exhiben en el Sitio, sin embargo, los colores de dichos
@@ -120,7 +120,7 @@ const TerminosYCondicionesPage = () => {
             </p>
 
             <p>
-                Supper exhibe con precisión los colores de los Productos que
+                Frutivida exhibe con precisión los colores de los Productos que
                 aparecen en el Sitio, así como de las fotografías que le
                 proporcionen los proveedores o cualquier tercero y que se
                 exhiben en el Sitio, sin embargo, los colores de dichos
@@ -144,7 +144,7 @@ const TerminosYCondicionesPage = () => {
             </p>
             <p>
                 Tratándose de productos cuyo precio total se determine con base
-                en su peso a granel (precio por kilo), Supper hará su mejor
+                en su peso a granel (precio por kilo), Frutivida hará su mejor
                 esfuerzo para entregar al Cliente la cantidad exacta que éste
                 haya solicitado. No obstante lo anterior, el Cliente reconoce y
                 acepta que dada la naturaleza de dicho producto, es posible que
@@ -159,7 +159,7 @@ const TerminosYCondicionesPage = () => {
                 solicita la entrega, estas deberán ser en salas de recepción,
                 las entregas se limitan a un tiempo de espera, revisión y
                 entrega de artículos de un máximo 15 (quince) minutos, las
-                entregas no incluyen instalación, ni maniobra. Supper podrá
+                entregas no incluyen instalación, ni maniobra. Frutivida podrá
                 negar la entrega en bodegas de recibo o entrada de proveedores.
             </p>
             <p>
@@ -180,7 +180,7 @@ const TerminosYCondicionesPage = () => {
             <p>2. Entrega Pick & Go</p>
             <p>
                 Al momento de realizar el Pedido, el Cliente puede solicitar a
-                Supper recoger sus Productos en diferentes puntos de entrega de
+                Frutivida recoger sus Productos en diferentes puntos de entrega de
                 Zona Esmeralda, en el horario establecido.
             </p>
             <h2 className="font-bold text-2xl">GENERALES DEL PEDIDO</h2>
@@ -208,9 +208,9 @@ const TerminosYCondicionesPage = () => {
                 venta.
             </h2>
             <p>
-                Supper con la finalidad de brindarle un mejor servicio, puede
+                Frutivida con la finalidad de brindarle un mejor servicio, puede
                 contratar a terceros para el surtido y la entrega de pedidos.
-                Supper otorga la facultad para que un tercero tenga contacto con
+                Frutivida otorga la facultad para que un tercero tenga contacto con
                 nuestro cliente ya sea vía telefónica y presencial, en caso de
                 la entrega del mismo.
             </p>
@@ -264,12 +264,12 @@ const TerminosYCondicionesPage = () => {
 
             <p className="font-bold">Cancelación del pedido</p>
             <p>
-                Supper se reserva el derecho de hacer un reembolso y cancelación
+                Frutivida se reserva el derecho de hacer un reembolso y cancelación
                 al pedido de un cliente si se considera necesario en función de
-                proteger los intereses de Supper.
+                proteger los intereses de Frutivida.
             </p>
             <p>
-                A petición del cliente, Supper podrá cancelar total o
+                A petición del cliente, Frutivida podrá cancelar total o
                 parcialmente el Pedido vía telefónica al número que aparezca en
                 el sitio web. Y únicamente será antes del embarque del pedido.
             </p>
@@ -291,7 +291,7 @@ const TerminosYCondicionesPage = () => {
             </p>
             <h2 className="font-bold text-2xl">MODIFICACIONES AL SITIO</h2>
             <p>
-                Supper podrá en cualquier momento y cuando lo considere
+                Frutivida podrá en cualquier momento y cuando lo considere
                 conveniente, sin necesidad de aviso al cliente, realizar
                 correcciones, adiciones, mejoras o modificaciones al contenido,
                 presentación, información, servicios, áreas bases de datos y

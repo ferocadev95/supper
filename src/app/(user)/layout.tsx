@@ -22,7 +22,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Supper",
+  title: "Frutivida",
   description: "Tienda online de frutas, verduras y abarrotes.",
 };
 

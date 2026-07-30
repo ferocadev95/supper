@@ -9,10 +9,10 @@ const BestSellerProductList = async () => {
     return (
         <div className="flex flex-col gap-5 pt-5 pb-10">
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-medium">Productos Más Vendidos</h2>
+                <h2 className="text-2xl font-medium accent-bar">Productos Más Vendidos</h2>
                 <Link
                     href={"/productos"}
-                    className="font-medium px-4 text-gray-600  py-2 bg-blue-50 hover:bg-blue-200 rounded-full text-center hoverEffect"
+                    className="btn-outline font-medium px-4 py-2 rounded-full text-center"
                 >
                     Ver Más
                 </Link>

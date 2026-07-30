@@ -17,7 +17,7 @@ const SidebarExpanded = () => {
             <div className="flex justify-end">
                 <button
                     onClick={handleExpansion}
-                    className="lg:hidden flex gap-x-2 items-center p-2 text-gray-600 hover:text-primaryRed bg-gray-100 border-gray-300/50 border-[1px] rounded-md hover:bg-red-100 hover:border-primaryRed hoverEffect mt-4"
+                    className="lg:hidden flex gap-x-2 items-center p-2 text-gray-600 hover:text-primaryGold bg-gray-100 border-gray-300/50 border-[1px] rounded-md hover:bg-primaryGold/10 hover:border-primaryGold hoverEffect mt-4"
                 >
                     <FaFilter className="text-2xl" />
                     <span className="text-sm">Filtros</span>
@@ -29,7 +29,7 @@ const SidebarExpanded = () => {
                 <SidebarProducts />
                 <button
                     onClick={handleExpansion}
-                    className="absolute top-6 block lg:hidden right-6 text-gray-500 hover:text-primaryRed hoverEffect"
+                    className="absolute top-6 block lg:hidden right-6 text-gray-500 hover:text-primaryGold hoverEffect"
                 >
                     <PiXCircleDuotone className="text-3xl" />
                 </button>

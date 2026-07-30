@@ -3,7 +3,7 @@ const AvisoPrivacidadPage = () => {
         <div className="p-8 w-full max-w-screen-xl mx-auto flex flex-col gap-y-4">
             <h1 className="font-bold text-3xl">Aviso de Privacidad</h1>
             <p>
-                Supper siendo parte de CORPORATIVO ADK SISTEMAS Y SERVICIOS SA
+                Frutivida siendo parte de CORPORATIVO ADK SISTEMAS Y SERVICIOS SA
                 de CV, con domicilio en Niños Héroes S/N San Gaspar
                 Tlahuelilipan CP 52147, es responsable al recabar sus datos
                 personales del uso que se le dé a los mismos y de su protección
@@ -94,7 +94,7 @@ const AvisoPrivacidadPage = () => {
                 requerimientos para la prestación u ofrecimiento de nuestros
                 servicios o productos. Estas modificaciones estarán disponibles
                 al público a través de nuestra página de Internet
-                www.supper.com.mx , donde igual podrá consultar el Aviso de
+                www.frutivida.com.mx , donde igual podrá consultar el Aviso de
                 Privacidad Integral.
             </p>
             <p>

@@ -22,14 +22,14 @@ const VerifyEmailPage = async ({ searchParams }: VerifyEmailPageProps) => {
         {result.ok ? (
           <Link
             href="/sign-in"
-            className="bg-primaryRed hover:bg-red-400 hoverEffect px-4 py-3 rounded-full text-white font-semibold"
+            className="btn-primary px-4 py-3 rounded-full"
           >
             Iniciar sesión
           </Link>
         ) : (
           <Link
             href="/sign-up"
-            className="text-primaryBlue hover:underline"
+            className="text-primaryGreen hover:underline"
           >
             Volver a registrarse
           </Link>

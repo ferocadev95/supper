@@ -17,7 +17,7 @@ const SearchInput = () => {
 
     return (
         <div className="flex-1 inline-flex h-12 relative min-w-[300px]">
-            <CiSearch className="text-lg absolute left-2.5 mt-3.5 text-primaryRed" />
+            <CiSearch className="text-lg absolute left-2.5 mt-3.5 text-primaryGold" />
             <form onSubmit={onSubmit} className="flex items-center w-full">
                 <input
                     type="search"
@@ -30,7 +30,7 @@ const SearchInput = () => {
                 />
                 <button
                     type="submit"
-                    className="bg-primaryRed text-white absolute right-0 px-3.5 py-1.5 mr-1.5 text-sm hover:bg-red-400 hoverEffect font-medium top-2 rounded-full"
+                    className="btn-primary absolute right-0 px-3.5 py-1.5 mr-1.5 text-sm font-medium top-2 rounded-full"
                 >
                     Buscar
                 </button>

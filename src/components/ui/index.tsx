@@ -72,7 +72,7 @@ export const Badge = ({
     variant?: "default" | "success" | "destructive";
 }>) => {
     const variantClasses = {
-        default: "bg-primaryBlue text-white hover:bg-primaryBlue/80",
+        default: "bg-primaryGreenDark text-white hover:bg-primaryGreen",
         success: "bg-green-500 text-white",
         destructive: "bg-red-500 text-white",
     };

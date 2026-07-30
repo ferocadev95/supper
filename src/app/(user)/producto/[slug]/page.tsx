@@ -161,7 +161,7 @@ const SingleProductPage = async ({ params }: Props) => {
                                     )}
                                     <p>
                                         Ahorraste en este producto{" "}
-                                        <span className="bg-green-600 font-semibold text-sm text-white rounded-full px-3 py-1">
+                                        <span className="bg-primaryGold font-semibold text-sm text-primaryDark rounded-full px-3 py-1">
                                             {(
                                                 (product?.rowprice /
                                                     (product?.pPrice ||

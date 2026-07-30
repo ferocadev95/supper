@@ -36,14 +36,14 @@ const Header = () => {
           <div className="hidden md:inline-flex items-center gap-5 overflow-visible">
             <Link href="/carrito" className="relative">
               <FaCartShopping className="text-2xl" />
-              <span className="absolute -top-2 -right-2 bg-primaryRed text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+              <span className="absolute -top-2 -right-2 bg-primaryGold text-primaryDark text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
                 {cartItems ? cartItems?.length : 0}
               </span>
             </Link>
             {session?.user ? (
               <Link
                 href={"/perfil"}
-                className="flex items-center gap-x-1 hover:text-primaryRed hoverEffect"
+                className="flex items-center gap-x-1 hover:text-primaryGold hoverEffect"
               >
                 <MdAccountCircle className="text-2xl" />
                 <span className="text-sm">Perfil</span>
@@ -51,7 +51,7 @@ const Header = () => {
             ) : (
               <Link
                 href="/sign-in"
-                className="flex items-center text-gray-700 gap-x-1 hover:border-primaryBlue font-semibold text-sm px-3 py-2 border-[1px] border-gray-300/50 rounded-md bg-white hover:bg-primaryBlue hover:text-white hoverEffect"
+                className="flex items-center text-gray-700 gap-x-1 hover:border-primaryGreen font-semibold text-sm px-3 py-2 border-[1px] border-gray-300/50 rounded-md bg-white hover:bg-primaryGreen hover:text-white hoverEffect"
               >
                 <span>Iniciar</span>
                 <span>Sesión</span>
@@ -62,7 +62,7 @@ const Header = () => {
         {session?.user && (
           <Link
             href="/pedidos"
-            className="navBarItem hidden md:inline-flex border-[1px] px-2 py-2 rounded-md border-gray-300 hover:text-white hover:bg-primaryBlue"
+            className="navBarItem hidden md:inline-flex border-[1px] px-2 py-2 rounded-md border-gray-300 hover:text-white hover:bg-primaryGreen"
           >
             Mis Pedidos
           </Link>
@@ -70,7 +70,7 @@ const Header = () => {
         <div className="inline-flex gap-x-4 md:hidden">
           <Link href="/carrito" className="relative">
             <FaCartShopping className="text-2xl" />
-            <span className="absolute -top-2 -right-2 bg-primaryRed text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+            <span className="absolute -top-2 -right-2 bg-primaryGold text-primaryDark text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
               {cartItems ? cartItems?.length : 0}
             </span>
           </Link>

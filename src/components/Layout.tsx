@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Provider store={store}>
       <PersistGate
-        loading={<Loader size={48} color="#DD4952" />}
+        loading={<Loader size={48} color="#6b9a2e" />}
         persistor={persistor}
       >
         <CartSync />

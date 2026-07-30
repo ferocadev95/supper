@@ -19,7 +19,7 @@ export function ResetPasswordTemplate({
   return (
     <Html>
       <Head />
-      <Preview>Restablece tu contraseña de Supper</Preview>
+      <Preview>Restablece tu contraseña de Frutivida</Preview>
       <Tailwind>
         <Heading className="mx-0 my-[30px] p-0 text-center text-3xl font-bold text-black">
           🍅 Restablecer contraseña 🍅
@@ -30,7 +30,7 @@ export function ResetPasswordTemplate({
         </Text>
         <Section className="my-[32px] text-center">
           <Button
-            className="text-md rounded-full bg-red-500 px-5 py-3 text-center font-semibold text-white no-underline"
+            className="text-md rounded-full bg-[#4c711e] px-5 py-3 text-center font-semibold text-white no-underline"
             href={resetUrl}
           >
             Crear nueva contraseña

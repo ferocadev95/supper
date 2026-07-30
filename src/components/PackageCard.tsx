@@ -69,7 +69,7 @@ export default function PackageCard({ packages }: Props) {
                             onClick={() => {
                                 handleAddToCart(item.dbId);
                             }}
-                            className="mr-4 bg-primaryBlue hover:bg-blue-400 px-6 py-2 rounded-full text-white font-semibold hoverEffect"
+                            className="btn-secondary mr-4 px-6 py-2 rounded-full"
                         >
                             Agregar al carrito
                         </button>

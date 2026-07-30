@@ -128,7 +128,7 @@ const SuccessContainer = ({
                     <Loader
                         title="El pedido está siendo procesado. Por favor espera..."
                         size={48}
-                        color="#DD4954"
+                        color="#6b9a2e"
                     />
                 </div>
             ) : (
@@ -175,13 +175,13 @@ const SuccessContainer = ({
                             {!error && (
                                 <div className="flex flex-wrap gap-4 items-center justify-center">
                                     <Link href={"/"}>
-                                        <button className="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1">
+                                        <button className="btn-secondary px-4 py-2 rounded-full shadow-md hover:-translate-y-1">
                                             <HiHome className="mr-2 h-5 w-5" />
                                             Inicio
                                         </button>
                                     </Link>
                                     <Link href={"/pedidos"}>
-                                        <button className="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1">
+                                        <button className="btn-primary px-4 py-2 rounded-full shadow-md hover:-translate-y-1">
                                             <HiInformationCircle className="mr-2 h-5 w-5" />
                                             Mis Pedidos
                                         </button>
