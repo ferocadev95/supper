@@ -4,7 +4,7 @@ import { ResetPasswordTemplate } from "../components/emails/ResetPasswordTemplat
 
 // Remitente configurable. En dev, sin dominio verificado en Resend, usa
 // EMAIL_FROM="onboarding@resend.dev" (solo envía a tu propio correo de Resend).
-const FROM = process.env.EMAIL_FROM || "no-reply@registrofrutivida.store";
+const FROM = process.env.EMAIL_FROM || "onboarding@resend.dev";
 
 // URL base de la app para construir los enlaces de los correos.
 function baseUrl(): string {
