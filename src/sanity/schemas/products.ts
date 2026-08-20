@@ -129,7 +129,6 @@ export default defineType({
           { title: "Clemente Jacques", value: "clemente jacques" },
           { title: "San Juan", value: "san juan" },
           { title: "La Moderna", value: "la moderna" },
-          { title: "La Parroquia", value: "la parroquia" },
           { title: "Variado", value: "variado" },
           { title: "Natural", value: "natural" },
         ],
