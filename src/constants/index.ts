@@ -18,10 +18,6 @@ export const navBarList = [
     title: "Chiles Secos",
     link: "/productos?categoria=chiles-secos",
   },
-  {
-    title: "Helados y Paletas",
-    link: "/productos?categoria=helados-y-paletas",
-  },
   { title: "Todos los Productos", link: "/productos" },
 ];
 
