@@ -11,8 +11,19 @@ const SearchInput = () => {
     const onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const searchQuery = formData.get("search");
-        router.replace(`/productos?search=${searchQuery}`);
+        const searchQuery = String(formData.get("search") ?? "").trim();
+
+        // URLSearchParams codifica el término (`&`, `#` y `+` rompían la URL) y
+        // conserva los filtros activos, que antes se perdían al buscar.
+        const params = new URLSearchParams(searchParams.toString());
+        if (searchQuery) {
+            params.set("search", searchQuery);
+        } else {
+            params.delete("search");
+        }
+        params.delete("page");
+
+        router.replace(`/productos?${params.toString()}`);
     };
 
     return (

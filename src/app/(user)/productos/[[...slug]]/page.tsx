@@ -5,6 +5,16 @@ import Pagination from "../../../../components/Pagination";
 import Container from "../../../../components/Container";
 import ProductList from "../../../../components/ProductList";
 import SidebarExpanded from "../../../../components/SidebarExpanded";
+import { searchProducts } from "../../../../lib/search";
+
+const PROJECTION = `{
+    ...
+}`;
+
+// Tope al traer el catálogo completo para buscar en Node. Holgado para el
+// catálogo actual; si creciera por encima, tocaría desnormalizar un campo de
+// búsqueda en el schema de Sanity.
+const SEARCH_FETCH_LIMIT = 1000;
 
 interface Props {
     searchParams: Promise<{
@@ -27,23 +37,40 @@ const ShopPage = async ({ searchParams }: Props) => {
     const end = start + PRODUCTS_PER_PAGE;
 
     const productFilter = `_type == "product"`;
-    const categoryFilter = categoria
-        ? `&& productCategory == "${categoria}"`
-        : "";
-    const brandFilter = marca ? `&& brand == "${marca}"` : "";
+    const categoryFilter = categoria ? `&& productCategory == $categoria` : "";
+    const brandFilter = marca ? `&& brand == $marca` : "";
     const bestSellerFilter = masVendido ? `&& bestseller == ${masVendido}` : "";
     const offersFilter = ofertas ? `&& rowprice > 0` : "";
-    const searchFilter = search ? `&& title match "${search}"` : "";
 
-    const filter = `*[${productFilter}${categoryFilter}${brandFilter}${bestSellerFilter}${offersFilter}${searchFilter}]`;
-    const countFilter = `count(*[${productFilter}${categoryFilter}${brandFilter}${bestSellerFilter}${offersFilter}${searchFilter}])`;
+    const filter = `*[${productFilter}${categoryFilter}${brandFilter}${bestSellerFilter}${offersFilter}]`;
+    const params = {
+        ...(categoria ? { categoria } : {}),
+        ...(marca ? { marca } : {}),
+    };
 
-    const products = await client.fetch<ProductData[]>(
-        groq`${filter} {
-            ...
-        }|order(_createdAt asc) [${start}...${end}]`
-    );
-    const totalProducts = await client.fetch(groq`${countFilter}`);
+    // La búsqueda no puede resolverse en GROQ: `match` es accent-sensitive y
+    // opera por tokens completos, así que "platano" nunca encuentra "Plátano"
+    // ni "manz" encuentra "Manzana". Se trae el conjunto filtrado y se ordena
+    // por relevancia en Node.
+    let products: ProductData[];
+    let totalProducts: number;
+
+    if (search) {
+        const candidates = await client.fetch<ProductData[]>(
+            groq`${filter} ${PROJECTION}|order(_createdAt asc) [0...${SEARCH_FETCH_LIMIT}]`,
+            params
+        );
+        const ranked = searchProducts(candidates, search);
+
+        products = ranked.slice(start, end);
+        totalProducts = ranked.length;
+    } else {
+        products = await client.fetch<ProductData[]>(
+            groq`${filter} ${PROJECTION}|order(_createdAt asc) [${start}...${end}]`,
+            params
+        );
+        totalProducts = await client.fetch(groq`count(${filter})`, params);
+    }
 
     return (
         <Container>

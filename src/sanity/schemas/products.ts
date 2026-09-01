@@ -1,5 +1,7 @@
 import { defineField, defineType } from "sanity";
 
+import { PRODUCT_BRANDS, PRODUCT_CATEGORIES } from "../../constants";
+
 export default defineType({
   name: "product",
   title: "Product",
@@ -42,30 +44,10 @@ export default defineType({
       type: "string",
       description: "Select the category",
       options: {
-        list: [
-          { title: "Frutas y Verduras", value: "frutas-y-verduras" },
-          {
-            value: "abarrotes",
-            title: "Abarrotes",
-          },
-          {
-            value: "condimentos-y-especias",
-            title: "Condimentos y Especias",
-          },
-          {
-            value: "frutos-secos-y-varios",
-            title: "Frutos Secos y Varios",
-          },
-          {
-            value: "granos-y-semillas",
-            title: "Granos y Semillas",
-          },
-          { value: "chiles-secos", title: "Chiles Secos" },
-          {
-            title: "Huevo",
-            value: "huevo",
-          },
-        ],
+        list: PRODUCT_CATEGORIES.map(({ value, label }) => ({
+          value,
+          title: label,
+        })),
       },
       validation: (rule) => rule.required(),
     }),
@@ -118,20 +100,10 @@ export default defineType({
       title: "Brand",
       type: "string",
       options: {
-        list: [
-          { title: "Genérico", value: "generico" },
-          { title: "Mr. Lucky", value: "mrlucky" },
-          { title: "Bimbo", value: "bimbo" },
-          { title: "Pronto", value: "pronto" },
-          { title: "Verde Valle", value: "verde valle" },
-          { title: "La Fina", value: "la fina" },
-          { title: "Knorr", value: "knorr" },
-          { title: "Clemente Jacques", value: "clemente jacques" },
-          { title: "San Juan", value: "san juan" },
-          { title: "La Moderna", value: "la moderna" },
-          { title: "Variado", value: "variado" },
-          { title: "Natural", value: "natural" },
-        ],
+        list: PRODUCT_BRANDS.map(({ value, label }) => ({
+          value,
+          title: label,
+        })),
       },
     }),
     defineField({

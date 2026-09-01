@@ -1,45 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { PRODUCT_CATEGORIES, SIDEBAR_BRANDS } from "../constants";
 
 const categoryFilter = {
   name: "Categorías",
-  options: [
-    { value: "frutas-y-verduras", label: "Frutas y Verduras" },
-    {
-      value: "abarrotes",
-      label: "Abarrotes",
-    },
-    {
-      value: "condimentos-y-especias",
-      label: "Condimentos y Especias",
-    },
-    { value: "frutos-secos-y-varios", label: "Frutos Secos y Varios" },
-    {
-      value: "granos-y-semillas",
-      label: "Granos y Semillas",
-    },
-    { value: "chiles-secos", label: "Chiles Secos" },
-    { value: "huevo", label: "Huevo" },
-  ],
+  options: PRODUCT_CATEGORIES,
 };
 
 const brandFilter = {
   name: "Marcas",
-  options: [
-    { value: "mrlucky", label: "Mr. Lucky" },
-    { value: "generico", label: "Genérico" },
-    { value: "variado", label: "Variado" },
-    { value: "bimbo", label: "Bimbo" },
-    { value: "pronto", label: "Pronto" },
-    { value: "verde valle", label: "Verde Valle" },
-    { value: "la fina", label: "La Fina" },
-    { value: "knorr", label: "Knorr" },
-    { value: "clemente jacques", label: "Clemente Jacques" },
-    { value: "san juan", label: "San Juan" },
-    { value: "la moderna", label: "La Moderna" },
-  ],
+  options: SIDEBAR_BRANDS,
 };
 
 const otherFilter = {
@@ -50,30 +21,21 @@ const otherFilter = {
   ],
 };
 
-// interface FilterState {
-//     category: string;
-//     brand: string;
-//     bestSeller: boolean;
-//     offers: boolean;
-// }
-
 const SidebarProducts = () => {
   const searchParams = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedBrand, setSelectedBrand] = useState<string>("");
-  const [selectedBestSeller, setSelectedBestSeller] = useState<boolean>(false);
-  const [selectedOffers, setSelectedOffers] = useState<boolean>(false);
-  // const [filters, setFilters] = useState<FilterState>({
-  //     category: "",
-  //     brand: "",
-  //     bestSeller: false,
-  //     offers: false,
-  // });
   const router = useRouter();
+
+  // La URL es la única fuente de verdad: el estado se deriva de ella en cada
+  // render. Duplicarlo en useState obligaba a un efecto de sincronización que
+  // solo reflejaba un filtro a la vez y nunca reseteaba los checkboxes al
+  // navegar hacia atrás.
+  const selectedCategory = searchParams.get("categoria") ?? "";
+  const selectedBrand = searchParams.get("marca") ?? "";
+  const selectedBestSeller = searchParams.has("masVendido");
+  const selectedOffers = searchParams.has("ofertas");
 
   const handleCategoryChange = (category: string) => {
     const newCategory = category === selectedCategory ? "" : category;
-    setSelectedCategory(newCategory);
 
     const params = new URLSearchParams(searchParams);
     if (newCategory === "") {
@@ -89,7 +51,6 @@ const SidebarProducts = () => {
 
   const handleBrandChange = (brand: string) => {
     const newBrand = brand === selectedBrand ? "" : brand;
-    setSelectedBrand(newBrand);
 
     const params = new URLSearchParams(searchParams);
 
@@ -106,7 +67,6 @@ const SidebarProducts = () => {
 
   const handleBestSellerChange = (bestseller: boolean) => {
     const newBestSeller = !bestseller;
-    setSelectedBestSeller(newBestSeller);
 
     const params = new URLSearchParams(searchParams);
 
@@ -123,7 +83,6 @@ const SidebarProducts = () => {
 
   const handleOffersChange = (offers: boolean) => {
     const newOffer = !offers;
-    setSelectedOffers(newOffer);
 
     const params = new URLSearchParams(searchParams);
 
@@ -137,23 +96,6 @@ const SidebarProducts = () => {
       router.replace(`/productos?${params.toString()}`);
     }
   };
-
-  useEffect(() => {
-    const categoryParam = searchParams.get("categoria");
-    const brandParam = searchParams.get("marca");
-    const bestSellerParam = searchParams.has("mas-vendido");
-    const offerParam = searchParams.has("ofertas");
-
-    if (categoryParam) {
-      setSelectedCategory(categoryParam);
-    } else if (brandParam) {
-      setSelectedBrand(brandParam);
-    } else if (bestSellerParam) {
-      setSelectedBestSeller(bestSellerParam);
-    } else if (offerParam) {
-      setSelectedOffers(offerParam);
-    }
-  }, [searchParams]);
 
   return (
     <aside className="w-80 bg-white py-10 px-6 min-h-screen h-full overflow-y-auto shadow-xl lg:shadow-none border-t-0 lg:border-r-[1px] border-gray-300/50">
