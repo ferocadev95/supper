@@ -26,6 +26,7 @@ export const PRODUCT_BRANDS = [
   { value: "clemente jacques", label: "Clemente Jacques" },
   { value: "san juan", label: "San Juan" },
   { value: "la moderna", label: "La Moderna" },
+  { value: "monte blanco", label: "Monte Blanco" },
   { value: "natural", label: "Natural" },
 ];
 
