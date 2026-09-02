@@ -10,6 +10,18 @@ import type { ProductData } from "../../types";
 export const SHIPPING_COST = 50;
 export const FREE_SHIPPING_THRESHOLD = 300;
 
+/** Límites de una cantidad en kilogramos, compartidos por los campos de kg del
+ *  carrito y de la página de producto, y por la revalidación del checkout. */
+export const KG_MIN = 0.1;
+export const KG_MAX = 100;
+
+/**
+ * Cantidad en kg válida para una línea `kg`/`100g`, o para un lado de `m-kg`
+ * cuando `allowZero` (un lado puede ser 0 mientras el otro no lo sea).
+ */
+export const isValidKgQuantity = (kg: number, allowZero = false): boolean =>
+    Number.isFinite(kg) && kg <= KG_MAX && (allowZero ? kg >= 0 : kg >= KG_MIN);
+
 export type ProductType = ProductData["productType"];
 
 /** The price-bearing fields — the server fills these from Sanity, never the client. */

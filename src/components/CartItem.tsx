@@ -4,10 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "../sanity/lib/image";
 import { useDispatch } from "react-redux";
-import { removeFromCart } from "../lib/redux/features/cart/cartSlice";
+import {
+    addToCartFruitVegetableGreen,
+    addToCartFruitVegetableMature,
+    addToCartKgQuantity,
+    removeFromCart,
+} from "../lib/redux/features/cart/cartSlice";
 import toast from "react-hot-toast";
 import FormattedPrice from "./FormattedPrice";
 import AddQtyToCartButton from "./AddQtyToCartButton";
+import CartKgQuantityInput from "./CartKgQuantityInput";
 import { PriceFields, computeLineSubtotal } from "../lib/pricing";
 
 interface Props {
@@ -36,6 +42,26 @@ const unitPrice = (price: PriceFields): number => {
 const CartItem = ({ item, price }: Props) => {
     const dispatch = useDispatch();
     const effectivePrice: PriceFields = price ?? item;
+
+    const mature = item?.matureQuantity ?? 0;
+    const green = item?.greenQuantity ?? 0;
+
+    // `resolveOrder` rechaza una línea `m-kg` con maduro + verde <= 0, así que
+    // el carrito lo bloquea aquí en vez de dejar que falle al pagar.
+    const commitMaturitySide = (
+        kg: number,
+        otherSide: number,
+        dispatchSide: () => void
+    ): boolean => {
+        if (kg + otherSide <= 0) {
+            toast.error(
+                "Debes dejar al menos una cantidad. Usa la ✕ para eliminar el producto."
+            );
+            return false;
+        }
+        dispatchSide();
+        return true;
+    };
 
     return (
         <div className="w-full grid grid-cols-5 mb-4 border border-gray-200 py-2">
@@ -72,31 +98,51 @@ const CartItem = ({ item, price }: Props) => {
                     )}
                     {item?.productType === "m-kg" && (
                         <div className="flex flex-col gap-2">
-                            <p className="text-sm font-semibold">
-                                <span>Maduro: </span>
-                                {item?.matureQuantity
-                                    ? item.matureQuantity
-                                    : 0}{" "}
-                                Kg
-                            </p>
-                            <p className="text-sm font-semibold">
-                                <span>Verde: </span>
-                                {item?.greenQuantity
-                                    ? item.greenQuantity
-                                    : 0}{" "}
-                                Kg
-                            </p>
+                            <CartKgQuantityInput
+                                allowZero
+                                label="Maduro"
+                                value={mature}
+                                onCommit={(kg) =>
+                                    commitMaturitySide(kg, green, () =>
+                                        dispatch(
+                                            addToCartFruitVegetableMature({
+                                                item,
+                                                matureQuantity: kg,
+                                            })
+                                        )
+                                    )
+                                }
+                            />
+                            <CartKgQuantityInput
+                                allowZero
+                                label="Verde"
+                                value={green}
+                                onCommit={(kg) =>
+                                    commitMaturitySide(kg, mature, () =>
+                                        dispatch(
+                                            addToCartFruitVegetableGreen({
+                                                item,
+                                                greenQuantity: kg,
+                                            })
+                                        )
+                                    )
+                                }
+                            />
                         </div>
                     )}
-                    {item?.productType === "100g" && (
-                        <p className="text-sm font-semibold">
-                            {item?.kgQuantity} Kg
-                        </p>
-                    )}
-                    {item?.productType === "kg" && (
-                        <p className="text-sm font-semibold">
-                            {item?.kgQuantity} kg
-                        </p>
+                    {(item?.productType === "kg" ||
+                        item?.productType === "100g") && (
+                        <CartKgQuantityInput
+                            value={item?.kgQuantity ?? 0}
+                            onCommit={(kg) => {
+                                dispatch(
+                                    addToCartKgQuantity({
+                                        item,
+                                        kgQuantity: kg,
+                                    })
+                                );
+                            }}
+                        />
                     )}
                 </div>
                 <div className="w-1/3 flex items-center font-bold text-lg">

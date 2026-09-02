@@ -5,6 +5,7 @@ import { ProductData } from "../../types";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import KgQuantityInput from "./KgQuantityInput";
 
 interface Props {
     item: ProductData;
@@ -30,9 +31,7 @@ const AddKgToCartButton = ({ item }: Props) => {
 
         setKgQuantity("");
 
-        dispatch(
-            addToCartKgQuantity({ item, kgQuantity: parseFloat(kgQuantity) })
-        );
+        dispatch(addToCartKgQuantity({ item, kgQuantity: parsedQuantity }));
 
         toast.success(`${item?.title.substring(0, 12)} añadido al carrito`);
     };
@@ -40,12 +39,11 @@ const AddKgToCartButton = ({ item }: Props) => {
         <>
             <p>Por favor seleccione la cantidad de producto:</p>
             {/* // TODO: Make proper validation with a form */}
-            <input
-                type="number"
-                placeholder="Cantidad en Kilogramos (Kg)"
+            <KgQuantityInput
                 value={kgQuantity}
-                onChange={(e) => setKgQuantity(e.target.value)}
-                className="border-[1px] border-gray-300/50 rounded-md px-2 py-2"
+                onChange={setKgQuantity}
+                onEnter={handleAddToCart}
+                placeholder="Cantidad en Kilogramos (Kg)"
             />
             <button
                 onClick={handleAddToCart}

@@ -4,6 +4,8 @@ import { groq } from "next-sanity";
 import { z } from "zod";
 import { client } from "../sanity/lib/client";
 import {
+    KG_MAX,
+    KG_MIN,
     PriceFields,
     ProductType,
     Quantities,
@@ -62,8 +64,8 @@ const freshClient = client.withConfig({ useCdn: false });
 
 // Enforcement of the same limits the UI validation routes advertise.
 const pieceSchema = z.number().min(1).max(200);
-const kgSchema = z.number().min(0.1).max(100);
-const kgSideSchema = z.number().min(0).max(100); // one maturity side may be 0
+const kgSchema = z.number().min(KG_MIN).max(KG_MAX);
+const kgSideSchema = z.number().min(0).max(KG_MAX); // one maturity side may be 0
 
 const validateQuantities = (productType: ProductType, line: SlimLine): void => {
     if (productType === "p") {

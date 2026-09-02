@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import reducer, {
     addToCart,
     addToCartBatch,
+    addToCartKgQuantity,
+    addToCartFruitVegetableMature,
+    addToCartFruitVegetableGreen,
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
@@ -118,6 +121,57 @@ describe("cartSlice reducers", () => {
             const item = state.cartItems.find((i) => i._id === "m");
             expect(item?.matureQuantity).toBe(5);
             expect(item?.greenQuantity).toBe(5);
+        });
+    });
+
+    // Estos tres reducers son también el camino de edición del carrito para los
+    // productos por peso (ver `CartItem`), por lo que su semántica de reemplazo
+    // — no de suma — es load-bearing.
+    describe("cantidades por peso (reemplazan, no suman)", () => {
+        it("addToCartKgQuantity reemplaza kgQuantity de un ítem existente", () => {
+            const item = makeItem({ _id: "kg1", productType: "kg" });
+            let state = reducer(
+                initial(),
+                addToCartKgQuantity({ item, kgQuantity: 2 })
+            );
+            expect(state.cartItems[0].kgQuantity).toBe(2);
+
+            state = reducer(state, addToCartKgQuantity({ item, kgQuantity: 3.5 }));
+            expect(state.cartItems).toHaveLength(1);
+            expect(state.cartItems[0].kgQuantity).toBe(3.5);
+        });
+
+        it("addToCartKgQuantity inserta el ítem si aún no está en el carrito", () => {
+            const item = makeItem({ _id: "kg1", productType: "kg" });
+            const state = reducer(
+                initial(),
+                addToCartKgQuantity({ item, kgQuantity: 1.5 })
+            );
+            expect(state.cartItems).toHaveLength(1);
+            expect(state.cartItems[0].kgQuantity).toBe(1.5);
+        });
+
+        it("los reducers de madurez reemplazan cada lado de forma independiente", () => {
+            const item = makeItem({ _id: "m1", productType: "m-kg" });
+            let state = reducer(
+                initial(),
+                addToCartFruitVegetableMature({ item, matureQuantity: 2 })
+            );
+            state = reducer(
+                state,
+                addToCartFruitVegetableGreen({ item, greenQuantity: 1 })
+            );
+            expect(state.cartItems).toHaveLength(1);
+            expect(state.cartItems[0].matureQuantity).toBe(2);
+            expect(state.cartItems[0].greenQuantity).toBe(1);
+
+            // Editar "verde" no toca "maduro".
+            state = reducer(
+                state,
+                addToCartFruitVegetableGreen({ item, greenQuantity: 4 })
+            );
+            expect(state.cartItems[0].matureQuantity).toBe(2);
+            expect(state.cartItems[0].greenQuantity).toBe(4);
         });
     });
 

@@ -24,8 +24,6 @@ interface Reservation {
 }
 
 const CartContainer = ({ session }: Props) => {
-    const [totalAmount, setTotalAmount] = useState<number>(0);
-    const [shipping, setShipping] = useState<number>(0);
     const [zipCode, setZipCode] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
     const [shippingMethod, setShippingMethod] = useState<
@@ -63,8 +61,12 @@ const CartContainer = ({ session }: Props) => {
 
     // Fetch fresh canonical prices from Sanity for the items in the cart, so the
     // displayed price tracks Sanity even if it changed after the item was added.
+    // Depende de la identidad de las líneas, no del objeto `cartItems`: cambiar
+    // una cantidad no altera los precios canónicos, así que sólo se refetchea
+    // al agregar o quitar productos.
+    const cartItemIds = cartItems.map((item) => item._id).join(",");
     useEffect(() => {
-        const ids = cartItems.map((item) => item._id);
+        const ids = cartItemIds.split(",").filter(Boolean);
         if (ids.length === 0) {
             setPricing({});
             return;
@@ -74,20 +76,17 @@ const CartContainer = ({ session }: Props) => {
             .catch((error) =>
                 console.error("Error fetching cart pricing", error)
             );
-    }, [cartItems]);
+    }, [cartItemIds]);
 
-    useEffect(() => {
-        const { subtotal, shipping } = computeCartTotals(
-            cartItems.map((item) => ({
-                price: priceFor(item),
-                quantities: item,
-            }))
-        );
-        setTotalAmount(subtotal);
-        setShipping(shipping);
-        // priceFor depends on `pricing`; recompute when either changes.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cartItems, pricing]);
+    // Totales derivados: son una función pura de las líneas y de los precios
+    // canónicos, así que se calculan en el render en vez de sincronizarse con
+    // un efecto (que provocaba un render extra por cada cambio de cantidad).
+    const { subtotal: totalAmount, shipping } = computeCartTotals(
+        cartItems.map((item) => ({
+            price: priceFor(item),
+            quantities: item,
+        }))
+    );
 
     useEffect(() => {
         const fetchReservationsData = async () => {

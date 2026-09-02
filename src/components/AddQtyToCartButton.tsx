@@ -8,7 +8,6 @@ import {
 import toast from "react-hot-toast";
 import { ProductData } from "../../types";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import { useEffect, useState } from "react";
 import { RootState } from "../lib/redux/store";
 
 interface Props {
@@ -18,19 +17,20 @@ interface Props {
 
 const AddQtyToCartButton = ({ item }: Props) => {
     const dispatch = useDispatch();
-    const [disabled, setDisabled] = useState<boolean>(false);
     const itemQuantity = useSelector((state: RootState) =>
         selectItemQuantityById(state, item._id)
     );
 
-    useEffect(() => {
-        setDisabled(itemQuantity < -1);
-    }, [itemQuantity]);
+    // En 1 pieza no hay nada que restar: `handleMinus` ya lo impide, y así el
+    // botón además se ve deshabilitado.
+    const disabled = itemQuantity <= 1;
 
     const handleAdd = async () => {
+        // Se valida la cantidad resultante, no la actual: si no, en el tope
+        // permitido la comprobación pasaría y se agregaría una pieza de más.
         const response = await fetch("/api/quantity-validation", {
             method: "POST",
-            body: JSON.stringify({ quantity: itemQuantity }),
+            body: JSON.stringify({ quantity: itemQuantity + 1 }),
         });
 
         if (!response.ok) {

@@ -8,6 +8,7 @@ import { ProductData } from "../../types";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import KgQuantityInput from "./KgQuantityInput";
 
 interface Props {
     item: ProductData;
@@ -21,9 +22,6 @@ const MaturitySelect = ({ item }: Props) => {
     const handleSelection = (selectedMaturity: string) => {
         setMaturity(selectedMaturity);
     };
-
-    const matureQuantity = parseFloat(quantity);
-    const greenQuantity = parseFloat(quantity);
 
     const handleAddToCart = async () => {
         const parsedQuantity = parseFloat(quantity);
@@ -44,11 +42,20 @@ const MaturitySelect = ({ item }: Props) => {
         switch (maturity) {
             case "maduro":
                 dispatch(
-                    addToCartFruitVegetableMature({ item, matureQuantity })
+                    addToCartFruitVegetableMature({
+                        item,
+                        matureQuantity: parsedQuantity,
+                    })
                 );
                 break;
             case "verde":
-                dispatch(addToCartFruitVegetableGreen({ item, greenQuantity }));
+                dispatch(
+                    addToCartFruitVegetableGreen({
+                        item,
+                        greenQuantity: parsedQuantity,
+                    })
+                );
+                break;
             default:
                 break;
         }
@@ -83,12 +90,11 @@ const MaturitySelect = ({ item }: Props) => {
             </div>
             <p>Por favor seleccione la cantidad de producto:</p>
             {/* // TODO: Make proper validation */}
-            <input
-                type="number"
-                placeholder="Cantidad en Kilogramos (Kg)"
+            <KgQuantityInput
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                className="border-[1px] border-gray-300/50 rounded-md px-2 py-2"
+                onChange={setQuantity}
+                onEnter={handleAddToCart}
+                placeholder="Cantidad en Kilogramos (Kg)"
             />
             <button
                 onClick={handleAddToCart}

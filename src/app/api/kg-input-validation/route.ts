@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { KG_MAX, KG_MIN } from "../../../lib/pricing";
 
-const quantitySchema = z.number().min(0.1).max(100);
+const quantitySchema = z.number().min(KG_MIN).max(KG_MAX);
 
 export async function POST(request: Request) {
     const { quantity } = await request.json();

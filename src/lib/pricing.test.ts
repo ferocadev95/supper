@@ -6,6 +6,9 @@ import {
     computeCartTotals,
     toStripeLineItem,
     SHIPPING_COST,
+    KG_MIN,
+    KG_MAX,
+    isValidKgQuantity,
 } from "./pricing";
 
 const price = (overrides: Partial<PriceFields>): PriceFields => ({
@@ -126,5 +129,32 @@ describe("toStripeLineItem (verbatim charge math)", () => {
         const chargedPesos =
             (item.price_data.unit_amount * item.quantity) / 100;
         expect(chargedPesos).toBeCloseTo(computeLineSubtotal(p, q));
+    });
+});
+
+describe("isValidKgQuantity", () => {
+    it("acepta el rango [KG_MIN, KG_MAX]", () => {
+        expect(isValidKgQuantity(KG_MIN)).toBe(true);
+        expect(isValidKgQuantity(2.5)).toBe(true);
+        expect(isValidKgQuantity(KG_MAX)).toBe(true);
+    });
+
+    it("rechaza por debajo del mínimo y por encima del máximo", () => {
+        expect(isValidKgQuantity(0.05)).toBe(false);
+        expect(isValidKgQuantity(KG_MAX + 0.1)).toBe(false);
+    });
+
+    it("rechaza 0 salvo que se permita explícitamente (un lado de m-kg)", () => {
+        expect(isValidKgQuantity(0)).toBe(false);
+        expect(isValidKgQuantity(0, true)).toBe(true);
+    });
+
+    it("rechaza negativos aunque se permita el 0", () => {
+        expect(isValidKgQuantity(-1, true)).toBe(false);
+    });
+
+    it("rechaza entradas no numéricas", () => {
+        expect(isValidKgQuantity(NaN)).toBe(false);
+        expect(isValidKgQuantity(Infinity)).toBe(false);
     });
 });
