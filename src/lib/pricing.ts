@@ -99,6 +99,17 @@ export const computeCartTotals = (
 };
 
 /**
+ * Las líneas por peso se cobran en unidades de 10 g (`kg * 100`), y Stripe
+ * exige que `quantity` sea un entero. En coma flotante `1.1 * 100` da
+ * `110.00000000000001`, que la API rechaza con "Invalid integer" y deja el
+ * pedido sin poder pagarse; `Math.round` elimina ese residuo sin mover importes
+ * (comprobado contra Stripe en modo test: 1.1 kg a $30 cobra $33.00, igual que
+ * el subtotal mostrado).
+ */
+const toStripeUnits = (kg: number | undefined): number =>
+    Math.round((kg || 0) * 100);
+
+/**
  * Ported verbatim from the previous `/api/checkout` `quantitySelect`, so the
  * amounts Stripe receives are unchanged; the only difference is that the prices
  * now come from Sanity instead of the client body.
@@ -113,20 +124,20 @@ const quantitySelect = (
             price: (price.pPrice - (price.rowprice || 0)) * (q.quantity || 0),
         };
     } else if (price.productType === "100g") {
-        const quantity = (q.kgQuantity || 0) * 100;
+        const quantity = toStripeUnits(q.kgQuantity);
         return {
             quantity,
             price: (price.gramsPrice / 10 - (price.rowprice / 100 || 0)) * quantity,
         };
     } else if (price.productType === "kg") {
-        const quantity = (q.kgQuantity || 0) * 100;
+        const quantity = toStripeUnits(q.kgQuantity);
         return {
             quantity,
             price: (price.kgPrice / 100 - (price.rowprice / 100 || 0)) * quantity,
         };
     } else if (price.productType === "m-kg") {
         const totalQuantity =
-            (q.matureQuantity || 0) * 100 + (q.greenQuantity || 0) * 100;
+            toStripeUnits(q.matureQuantity) + toStripeUnits(q.greenQuantity);
         const totalPrice =
             (price.kgPrice / 100 - (price.rowprice / 100 || 0)) * totalQuantity;
         return { quantity: totalQuantity, price: totalPrice };

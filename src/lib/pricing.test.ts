@@ -132,6 +132,45 @@ describe("toStripeLineItem (verbatim charge math)", () => {
     });
 });
 
+// Stripe rechaza `quantity` no entera con "Invalid integer", dejando el pedido
+// sin poder pagarse. `1.1 * 100` en coma flotante da 110.00000000000001.
+describe("toStripeLineItem: quantity siempre entera", () => {
+    const trip = [1.1, 0.29, 4.6, 2.3, 8.7]; // kilajes que arrastran residuo
+
+    it("kg y 100g redondean las unidades de 10 g", () => {
+        for (const kg of trip) {
+            for (const productType of ["kg", "100g"] as const) {
+                const item = toStripeLineItem(
+                    price({ productType, kgPrice: 30, gramsPrice: 3 }),
+                    { kgQuantity: kg },
+                    { name: "x" }
+                );
+                expect(Number.isInteger(item.quantity)).toBe(true);
+            }
+        }
+    });
+
+    it("m-kg redondea cada lado antes de sumarlos", () => {
+        for (const kg of trip) {
+            const item = toStripeLineItem(
+                price({ productType: "m-kg", kgPrice: 30 }),
+                { matureQuantity: kg, greenQuantity: 0.1 },
+                { name: "x" }
+            );
+            expect(Number.isInteger(item.quantity)).toBe(true);
+        }
+    });
+
+    it("no altera el importe: 1.1 kg a $30 sigue cobrando $33", () => {
+        const p = price({ productType: "kg", kgPrice: 30 });
+        const q = { kgQuantity: 1.1 };
+        const item = toStripeLineItem(p, q, { name: "Plátano" });
+        expect((item.price_data.unit_amount * item.quantity) / 100).toBeCloseTo(
+            computeLineSubtotal(p, q)
+        );
+    });
+});
+
 describe("isValidKgQuantity", () => {
     it("acepta el rango [KG_MIN, KG_MAX]", () => {
         expect(isValidKgQuantity(KG_MIN)).toBe(true);
