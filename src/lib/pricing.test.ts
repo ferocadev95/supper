@@ -9,6 +9,7 @@ import {
     KG_MIN,
     KG_MAX,
     isValidKgQuantity,
+    discountPercent,
 } from "./pricing";
 
 const price = (overrides: Partial<PriceFields>): PriceFields => ({
@@ -195,5 +196,50 @@ describe("isValidKgQuantity", () => {
     it("rechaza entradas no numéricas", () => {
         expect(isValidKgQuantity(NaN)).toBe(false);
         expect(isValidKgQuantity(Infinity)).toBe(false);
+    });
+});
+
+describe("discountPercent", () => {
+    it("calcula el porcentaje sobre el precio de lista de cada tipo", () => {
+        expect(
+            discountPercent(price({ productType: "p", pPrice: 100, rowprice: 5 }))
+        ).toBe(5);
+        expect(
+            discountPercent(
+                price({ productType: "kg", kgPrice: 40, rowprice: 10 })
+            )
+        ).toBe(25);
+        expect(
+            discountPercent(
+                price({ productType: "m-kg", kgPrice: 40, rowprice: 10 })
+            )
+        ).toBe(25);
+        expect(
+            discountPercent(
+                price({ productType: "100g", gramsPrice: 20, rowprice: 1 })
+            )
+        ).toBe(5);
+    });
+
+    it("ignora los precios de otros tipos al elegir la base", () => {
+        // Un producto por kg puede traer pPrice heredado de Sanity; la base
+        // sigue siendo kgPrice.
+        expect(
+            discountPercent(
+                price({
+                    productType: "kg",
+                    kgPrice: 50,
+                    pPrice: 10,
+                    rowprice: 5,
+                })
+            )
+        ).toBe(10);
+    });
+
+    it("devuelve 0 sin descuento o sin precio base", () => {
+        expect(discountPercent(price({ productType: "p", pPrice: 100 }))).toBe(0);
+        expect(
+            discountPercent(price({ productType: "p", pPrice: 0, rowprice: 5 }))
+        ).toBe(0);
     });
 });

@@ -6,6 +6,7 @@ import FormattedPrice from "./FormattedPrice";
 import AddToCartButton from "./AddToCartButton";
 import SeeProductButton from "./SeeProductButton";
 import { Badge } from "./ui";
+import DiscountBadge from "./DiscountBadge";
 
 const ProductCard = ({ item }: { item: ProductData }) => {
     return (
@@ -25,7 +26,7 @@ const ProductCard = ({ item }: { item: ProductData }) => {
                     className="w-full h-48 object-contain p-2 group-hover:scale-105 hoverEffect"
                 />
             </Link>
-            <div className="px-6 flex flex-col items-center gap-2">
+            <div className="px-6 pb-5 flex flex-col items-center gap-2">
                 {item?.brand ? (
                     <p className="uppercase text-xs font-medium text-primaryGold mt-4">
                         {item.brand}
@@ -41,7 +42,7 @@ const ProductCard = ({ item }: { item: ProductData }) => {
                 <p className="text-center text-sm line-clamp-2 min-h-10">
                     {item?.description}
                 </p>
-                <div className="flex items-center gap-2 mb-5">
+                <div className="flex items-center gap-2">
                     {item?.rowprice ? (
                         <>
                             {item?.productType === "kg" && (
@@ -140,6 +141,7 @@ const ProductCard = ({ item }: { item: ProductData }) => {
                         </span>
                     ) : null}
                 </div>
+                <DiscountBadge price={item} />
             </div>
             {item?.productType !== "p" ? (
                 <SeeProductButton item={item} />

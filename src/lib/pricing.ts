@@ -85,6 +85,27 @@ export const computeLineSubtotal = (
     }
 };
 
+export const basePrice = (price: PriceFields): number => {
+    switch (price.productType) {
+        case "p":
+            return price.pPrice || 0;
+        case "100g":
+            return price.gramsPrice || 0;
+        case "kg":
+        case "m-kg":
+            return price.kgPrice || 0;
+        default:
+            return 0;
+    }
+};
+
+export const discountPercent = (price: PriceFields): number => {
+    const base = basePrice(price);
+    const rowprice = price.rowprice || 0;
+    if (base <= 0 || rowprice <= 0) return 0;
+    return (rowprice / base) * 100;
+};
+
 /** Subtotal + shipping rule (free over the threshold) + total. */
 export const computeCartTotals = (
     lines: CartLine[]
