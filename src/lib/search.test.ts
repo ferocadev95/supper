@@ -17,6 +17,14 @@ const PAPA = product("Papa Blanca", "natural", "frutas-y-verduras");
 const ARROZ = product("Arroz", "verde valle", "granos-y-semillas");
 const CACAHUATE = product("Cacahuate", "mrlucky", "frutos-secos-y-varios");
 const SURTIDO = product("Surtido de Nueces", "variado", "frutos-secos-y-varios");
+const BLUEBERRY = product("Blueberry", "natural", "frutas-y-verduras");
+const ZARZAMORA = product("Zarzamora", "natural", "frutas-y-verduras");
+const AGUACATE = product("Aguacate Hass", "natural", "frutas-y-verduras");
+const EJOTE = product("Ejote", "natural", "frutas-y-verduras");
+const PIMIENTO = product("Pimiento Rojo", "natural", "frutas-y-verduras");
+const PIMIENTA = product("Pimienta Entera Chica", "generico", "condimentos-y-especias");
+const FRIJOL = product("Frijol Negro", "generico", "granos-y-semillas");
+const HUEVO = product("Docena de Huevo", "natural", "huevo");
 
 const CATALOG = [
   PLATANO,
@@ -28,6 +36,14 @@ const CATALOG = [
   ARROZ,
   CACAHUATE,
   SURTIDO,
+  BLUEBERRY,
+  ZARZAMORA,
+  AGUACATE,
+  EJOTE,
+  PIMIENTO,
+  PIMIENTA,
+  FRIJOL,
+  HUEVO,
 ];
 
 const titles = (query: string) =>
@@ -153,6 +169,74 @@ describe("searchProducts — valores que no son marcas", () => {
     expect(titles("generico")).toEqual(
       expect.arrayContaining(["Chile Jalapeño", "Jugo de Manzana"])
     );
+  });
+});
+
+describe("searchProducts — sinónimos en inglés", () => {
+  it("encuentra el producto buscándolo en inglés", () => {
+    expect(titles("avocado")).toContain("Aguacate Hass");
+    expect(titles("eggs")).toContain("Docena de Huevo");
+  });
+
+  it("acepta el singular y el plural del alias", () => {
+    expect(titles("blueberry")).toContain("Blueberry");
+    expect(titles("blueberries")).toContain("Blueberry");
+  });
+
+  it("acepta alias de varias palabras", () => {
+    expect(titles("green beans")).toEqual(["Ejote"]);
+  });
+
+  it("también funciona del español al español", () => {
+    // "moras" es como se pide la zarzamora.
+    expect(titles("moras")).toContain("Zarzamora");
+  });
+
+  it("prefiere la frase más larga del diccionario", () => {
+    // "moras" por su cuenta lleva a la zarzamora, pero "moras azules" es el
+    // blueberry. Gana la frase completa.
+    expect(titles("moras azules")).toEqual(["Blueberry"]);
+  });
+
+  it("distingue los dos 'pepper' del catálogo", () => {
+    // Los dos productos salen en ambas búsquedas —"pimiento" y "pimienta" se
+    // parecen demasiado para que el fuzzy los separe—, pero cada consulta
+    // pone primero el suyo, que es lo que importa.
+    expect(titles("pepper")[0]).toBe("Pimiento Rojo");
+    expect(titles("black pepper")[0]).toBe("Pimienta Entera Chica");
+  });
+
+  it("compone un alias por palabra cuando la frase no está en el diccionario", () => {
+    // "black beans" no es una entrada: se resuelve como negro + frijol.
+    expect(titles("black beans")).toEqual(["Frijol Negro"]);
+  });
+
+  it("no rompe la búsqueda en español", () => {
+    expect(titles("aguacate")).toContain("Aguacate Hass");
+    expect(titles("huevo")).toContain("Docena de Huevo");
+  });
+
+  it("un match literal gana a uno por sinónimo", () => {
+    const catalogo = [
+      { title: "Mermelada de Mora Azul" },
+      { title: "Mermelada de Blueberry" },
+    ];
+
+    expect(searchProducts(catalogo, "blueberry")[0].title).toBe(
+      "Mermelada de Blueberry"
+    );
+  });
+
+  it("mantiene la semántica AND con sinónimos", () => {
+    expect(titles("avocado manzana")).toEqual([]);
+  });
+
+  it("combina un sinónimo del título con la marca literal", () => {
+    expect(titles("rice verde valle")).toEqual(["Arroz"]);
+  });
+
+  it("un token sin sinónimo y sin coincidencia sigue descartando", () => {
+    expect(titles("avocado xyz")).toEqual([]);
   });
 });
 

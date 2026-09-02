@@ -57,7 +57,7 @@ const Footer = () => {
                     </span>
                 </div>
                 <span className="text-gray-600 text-sm tracking-wide">
-                    © Copyright 2024 Frutivida, Todos los derechos reservados
+                    © Copyright 2026 Frutivida, Todos los derechos reservados
                 </span>
             </div>
         </footer>
