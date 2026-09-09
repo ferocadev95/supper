@@ -34,8 +34,10 @@ export const TableHead = ({
 export const TableCell = ({
     children,
     className,
-}: React.PropsWithChildren<{ className?: string }>) => (
+    colSpan,
+}: React.PropsWithChildren<{ className?: string; colSpan?: number }>) => (
     <td
+        colSpan={colSpan}
         className={`p-4 align-middle [&:has([role=checkbox])]:pr-0 ${className}`}
     >
         {children}

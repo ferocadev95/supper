@@ -29,11 +29,24 @@ import { AnimatePresence, motion } from "framer-motion";
 interface Order {
   id: string;
   value: {
+    // `amount` es histórico: siempre ha guardado el subtotal (sin envío).
     amount: number;
     items: ProductData[];
-    shipping: number;
+    subtotal?: number;
+    shipping?: number;
+    total?: number;
   };
 }
+
+// Lo cobrado = subtotal + envío. Los pedidos guardados antes de que se
+// persistieran `shipping`/`total` sólo tienen `amount` (el subtotal), así que
+// se reconstruye el total con lo que haya disponible.
+const orderAmounts = (value: Order["value"]) => {
+  const subtotal = value?.subtotal ?? value?.amount ?? 0;
+  const shipping = value?.shipping ?? 0;
+  const total = value?.total ?? subtotal + shipping;
+  return { subtotal, shipping, total };
+};
 
 const Orders = () => {
   const { data: session } = useSession();
@@ -76,210 +89,239 @@ const Orders = () => {
       ) : (
         <div className="flex flex-col gap-5">
           {orders?.length ? (
-            orders?.map((item) => (
-              <div key={item?.id}>
-                <Card
-                  className={
-                    expandedOrderId === item.id ? "border-primaryGold/30" : ""
-                  }
-                >
-                  <CardHeader>
-                    <CardTitle>
-                      ID del Pedido:{" "}
-                      <span className="text-base tracking-wide">
-                        {item?.id.slice(-10)}
-                      </span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardConent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-black/60">
-                          Monto Total
-                        </p>
+            orders?.map((item) => {
+              const { subtotal, shipping, total } = orderAmounts(item?.value);
+              return (
+                <div key={item?.id}>
+                  <Card
+                    className={
+                      expandedOrderId === item.id ? "border-primaryGold/30" : ""
+                    }
+                  >
+                    <CardHeader>
+                      <CardTitle>
+                        ID del Pedido:{" "}
+                        <span className="text-base tracking-wide">
+                          {item?.id.slice(-10)}
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardConent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-black/60">
+                            Monto Total
+                          </p>
 
-                        <FormattedPrice
-                          amount={item?.value?.amount}
-                          className="text-lg font-semibold"
-                        />
+                          <FormattedPrice
+                            amount={total}
+                            className="text-lg font-semibold"
+                          />
+                          <p className="text-xs text-black/60 mt-1">
+                            Subtotal{" "}
+                            <FormattedPrice
+                              amount={subtotal}
+                              className="text-xs font-normal"
+                            />
+                            {" + Envío "}
+                            <FormattedPrice
+                              amount={shipping}
+                              className="text-xs font-normal"
+                            />
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-black/60">
+                            Estatus de Pago
+                          </p>
+                          <Badge variant="success">Pagado</Badge>
+                        </div>
+                        <div className="flex justify-end">
+                          <Button
+                            onClick={() => toggleDetails(item.id)}
+                            className="md:max-w-52"
+                          >
+                            {expandedOrderId === item.id
+                              ? "Esconder detalles"
+                              : "Mostrar detalles"}
+                          </Button>
+                        </div>
+                        {/* <Button onClick={() => handleAddToCart(item.value.items)}> */}
+                        {/*   Agregar artículos al carrito */}
+                        {/* </Button> */}
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-black/60">
-                          Estatus de Pago
-                        </p>
-                        <Badge variant="success">Pagado</Badge>
-                      </div>
-                      <div className="flex justify-end">
-                        <Button
-                          onClick={() => toggleDetails(item.id)}
-                          className="md:max-w-52"
+                    </CardConent>
+                    <AnimatePresence>
+                      {expandedOrderId === item?.id && (
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            height: 0,
+                          }}
+                          animate={{
+                            opacity: 1,
+                            height: "auto",
+                          }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
                         >
-                          {expandedOrderId === item.id
-                            ? "Esconder detalles"
-                            : "Mostrar detalles"}
-                        </Button>
-                      </div>
-                      {/* <Button onClick={() => handleAddToCart(item.value.items)}> */}
-                      {/*   Agregar artículos al carrito */}
-                      {/* </Button> */}
-                    </div>
-                  </CardConent>
-                  <AnimatePresence>
-                    {expandedOrderId === item?.id && (
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          height: 0,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          height: "auto",
-                        }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Card className="border-0 border-t rounded-none">
-                          <CardHeader>
-                            <CardTitle>Productos</CardTitle>
-                          </CardHeader>
-                          <CardConent>
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Nombre</TableHead>
-                                  <TableHead className="text-center">
-                                    Precio
-                                  </TableHead>
-                                  <TableHead>Cantidad</TableHead>
-                                  <TableHead className="text-right">
-                                    Subtotal
-                                  </TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {item?.value?.items?.map(
-                                  (product: ProductData) => (
-                                    <TableRow key={product?._id}>
-                                      <TableCell>{product?.title}</TableCell>
-                                      <TableCell className="text-center">
-                                        {product?.productType === "kg" && (
-                                          <FormattedPrice
-                                            amount={
-                                              product?.kgPrice -
-                                              (product?.rowprice || 0)
-                                            }
-                                          />
-                                        )}
-                                        {product?.productType === "p" && (
-                                          <FormattedPrice
-                                            amount={
-                                              product?.pPrice -
-                                              (product?.rowprice || 0)
-                                            }
-                                          />
-                                        )}
-                                        {product?.productType === "m-kg" && (
-                                          <FormattedPrice
-                                            amount={
-                                              product?.kgPrice -
-                                              (product?.rowprice || 0)
-                                            }
-                                          />
-                                        )}
-                                        {product?.productType === "100g" && (
-                                          <FormattedPrice
-                                            amount={
-                                              product?.gramsPrice -
-                                              (product?.rowprice || 0)
-                                            }
-                                          />
-                                        )}
-                                      </TableCell>
-                                      <TableCell className="text-lg">
-                                        <div className="flex flex-col gap-1">
-                                          {product?.productType === "m-kg" && (
-                                            <>
-                                              <span className="text-sm">
-                                                Kg Maduro:{" "}
-                                                {product?.matureQuantity || 0}
-                                              </span>
-                                              <span className="text-sm">
-                                                Kg Verde:{" "}
-                                                {product?.greenQuantity || 0}
-                                              </span>
-                                            </>
-                                          )}
+                          <Card className="border-0 border-t rounded-none">
+                            <CardHeader>
+                              <CardTitle>Productos</CardTitle>
+                            </CardHeader>
+                            <CardConent>
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Nombre</TableHead>
+                                    <TableHead className="text-center">
+                                      Precio
+                                    </TableHead>
+                                    <TableHead>Cantidad</TableHead>
+                                    <TableHead className="text-right">
+                                      Subtotal
+                                    </TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {item?.value?.items?.map(
+                                    (product: ProductData) => (
+                                      <TableRow key={product?._id}>
+                                        <TableCell>{product?.title}</TableCell>
+                                        <TableCell className="text-center">
                                           {product?.productType === "kg" && (
-                                            <span className="text-sm">
-                                              Kg: {product?.kgQuantity || 0}
-                                            </span>
+                                            <FormattedPrice
+                                              amount={
+                                                product?.kgPrice -
+                                                (product?.rowprice || 0)
+                                              }
+                                            />
                                           )}
                                           {product?.productType === "p" && (
-                                            <span className="text-sm">
-                                              Piezas: {product?.quantity || 0}
-                                            </span>
+                                            <FormattedPrice
+                                              amount={
+                                                product?.pPrice -
+                                                (product?.rowprice || 0)
+                                              }
+                                            />
+                                          )}
+                                          {product?.productType === "m-kg" && (
+                                            <FormattedPrice
+                                              amount={
+                                                product?.kgPrice -
+                                                (product?.rowprice || 0)
+                                              }
+                                            />
                                           )}
                                           {product?.productType === "100g" && (
-                                            <span className="text-sm">
-                                              Kg: {product?.kgQuantity || 0}
-                                            </span>
+                                            <FormattedPrice
+                                              amount={
+                                                product?.gramsPrice -
+                                                (product?.rowprice || 0)
+                                              }
+                                            />
                                           )}
-                                        </div>
-                                      </TableCell>
-                                      <TableCell className="text-right font-semibold">
-                                        {product?.productType === "kg" && (
-                                          <FormattedPrice
-                                            amount={
-                                              (product?.kgPrice -
-                                                (product?.rowprice || 0)) *
-                                              product?.kgQuantity
-                                            }
-                                          />
-                                        )}
-                                        {product?.productType === "p" && (
-                                          <FormattedPrice
-                                            amount={
-                                              (product?.pPrice -
-                                                (product?.rowprice || 0)) *
-                                              product?.quantity
-                                            }
-                                          />
-                                        )}
-                                        {product?.productType === "m-kg" && (
-                                          <FormattedPrice
-                                            amount={
-                                              (product?.matureQuantity || 0) *
+                                        </TableCell>
+                                        <TableCell className="text-lg">
+                                          <div className="flex flex-col gap-1">
+                                            {product?.productType ===
+                                              "m-kg" && (
+                                              <>
+                                                <span className="text-sm">
+                                                  Kg Maduro:{" "}
+                                                  {product?.matureQuantity || 0}
+                                                </span>
+                                                <span className="text-sm">
+                                                  Kg Verde:{" "}
+                                                  {product?.greenQuantity || 0}
+                                                </span>
+                                              </>
+                                            )}
+                                            {product?.productType === "kg" && (
+                                              <span className="text-sm">
+                                                Kg: {product?.kgQuantity || 0}
+                                              </span>
+                                            )}
+                                            {product?.productType === "p" && (
+                                              <span className="text-sm">
+                                                Piezas: {product?.quantity || 0}
+                                              </span>
+                                            )}
+                                            {product?.productType ===
+                                              "100g" && (
+                                              <span className="text-sm">
+                                                Kg: {product?.kgQuantity || 0}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </TableCell>
+                                        <TableCell className="text-right font-semibold">
+                                          {product?.productType === "kg" && (
+                                            <FormattedPrice
+                                              amount={
                                                 (product?.kgPrice -
-                                                  (product?.rowprice || 0)) +
-                                              (product?.greenQuantity || 0) *
-                                                (product?.kgPrice -
-                                                  (product?.rowprice || 0))
-                                            }
-                                          />
-                                        )}
-                                        {product?.productType === "100g" && (
-                                          <FormattedPrice
-                                            amount={
-                                              (product?.gramsPrice * 10 -
-                                                (product?.rowprice || 0)) *
-                                              product?.kgQuantity
-                                            }
-                                          />
-                                        )}
-                                      </TableCell>
-                                    </TableRow>
-                                  ),
-                                )}
-                              </TableBody>
-                            </Table>
-                          </CardConent>
-                        </Card>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Card>
-              </div>
-            ))
+                                                  (product?.rowprice || 0)) *
+                                                product?.kgQuantity
+                                              }
+                                            />
+                                          )}
+                                          {product?.productType === "p" && (
+                                            <FormattedPrice
+                                              amount={
+                                                (product?.pPrice -
+                                                  (product?.rowprice || 0)) *
+                                                product?.quantity
+                                              }
+                                            />
+                                          )}
+                                          {product?.productType === "m-kg" && (
+                                            <FormattedPrice
+                                              amount={
+                                                (product?.matureQuantity || 0) *
+                                                  (product?.kgPrice -
+                                                    (product?.rowprice || 0)) +
+                                                (product?.greenQuantity || 0) *
+                                                  (product?.kgPrice -
+                                                    (product?.rowprice || 0))
+                                              }
+                                            />
+                                          )}
+                                          {product?.productType === "100g" && (
+                                            <FormattedPrice
+                                              amount={
+                                                (product?.gramsPrice * 10 -
+                                                  (product?.rowprice || 0)) *
+                                                product?.kgQuantity
+                                              }
+                                            />
+                                          )}
+                                        </TableCell>
+                                      </TableRow>
+                                    ),
+                                  )}
+                                  <TableRow>
+                                    <TableCell colSpan={3}>Envío</TableCell>
+                                    <TableCell className="text-right font-semibold">
+                                      <FormattedPrice amount={shipping} />
+                                    </TableCell>
+                                  </TableRow>
+                                  <TableRow>
+                                    <TableCell colSpan={3}>Total</TableCell>
+                                    <TableCell className="text-right font-semibold">
+                                      <FormattedPrice amount={total} />
+                                    </TableCell>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </CardConent>
+                          </Card>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Card>
+                </div>
+              );
+            })
           ) : (
             <div>
               <p className="text-lg font-medium -mt-3">

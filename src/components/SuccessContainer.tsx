@@ -3,7 +3,7 @@
 import { StoreState } from "../../types";
 import { useSession } from "next-auth/react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { resetCart } from "../lib/redux/features/cart/cartSlice";
 import Loader from "./Loader";
 import {
@@ -27,10 +27,16 @@ const SuccessContainer = ({
     const { cartItems } = useSelector((state: StoreState) => state?.cart);
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    // Una vez que el servidor confirma el importe cobrado, ese valor manda: el
+    // estimado local ya no puede volver a escribir sobre él.
+    const serverTotalRef = useRef<boolean>(false);
+    // El pedido se procesa una sola vez; `resetCart` vacía el carrito y volvía
+    // a disparar el efecto, dejando la página en el loader para siempre.
+    const processedRef = useRef<boolean>(false);
 
     const shippingMethod = searchParams.get("shipping_method")?.toString();
     const selectedHour = searchParams.get("selected_hour")?.toString();
@@ -39,6 +45,7 @@ const SuccessContainer = ({
     // Local estimate shown before the server responds; the authoritative total
     // returned by /api/saveorder replaces it once the order is persisted.
     useEffect(() => {
+        if (serverTotalRef.current || cartItems.length === 0) return;
         const { total } = computeCartTotals(
             cartItems.map((item) => ({ price: item, quantities: item }))
         );
@@ -87,7 +94,10 @@ const SuccessContainer = ({
             const data = await response.json();
             if (data?.success) {
                 // Reflect exactly what the server charged/saved.
-                if (typeof data.total === "number") setTotalAmount(data.total);
+                if (typeof data.total === "number") {
+                    serverTotalRef.current = true;
+                    setTotalAmount(data.total);
+                }
                 dispatch(resetCart());
             } else {
                 throw new Error("Error al guardar el pedido");
@@ -100,8 +110,10 @@ const SuccessContainer = ({
 
     useEffect(() => {
         const processOrder = async () => {
-            setLoading(true);
+            if (processedRef.current) return;
             if (session?.user && cartItems?.length > 0) {
+                processedRef.current = true;
+                setLoading(true);
                 try {
                     if (shippingMethod === "domicilio") {
                         await handleReservation();
@@ -120,6 +132,17 @@ const SuccessContainer = ({
 
         processOrder();
     }, [session?.user, cartItems?.length]);
+
+    // Si la sesión ya se resolvió y no hay nada que procesar (por ejemplo al
+    // recargar /success cuando el pedido ya se guardó y el carrito quedó
+    // vacío), se muestra la confirmación en vez de dejar el loader girando.
+    useEffect(() => {
+        if (status === "loading" || processedRef.current) return;
+        const timer = setTimeout(() => {
+            if (!processedRef.current) setLoading(false);
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, [status, cartItems?.length]);
 
     return (
         <div>

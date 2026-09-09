@@ -115,7 +115,11 @@ export const computeCartTotals = (
             acc + computeLineSubtotal(price, quantities),
         0
     );
-    const shipping = subtotal > FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    // Un carrito vacío no cobra envío: sin él, `[]` devolvía un total de
+    // $50 (sólo el envío), que es lo que se mostraba en la página de éxito
+    // después de vaciar el carrito.
+    const shipping =
+        subtotal <= 0 || subtotal > FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
     return { subtotal, shipping, total: subtotal + shipping };
 };
 

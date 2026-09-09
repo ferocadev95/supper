@@ -102,6 +102,14 @@ describe("computeCartTotals (shipping rule)", () => {
         });
     });
 
+    it("an empty cart has no shipping and no total", () => {
+        expect(computeCartTotals([])).toEqual({
+            subtotal: 0,
+            shipping: 0,
+            total: 0,
+        });
+    });
+
     it("free shipping above the threshold", () => {
         expect(computeCartTotals([line(301)])).toEqual({
             subtotal: 301,
