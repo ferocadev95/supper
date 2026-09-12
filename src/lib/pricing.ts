@@ -99,6 +99,25 @@ export const basePrice = (price: PriceFields): number => {
     }
 };
 
+/**
+ * Unidad a la que corresponde `basePrice`, tal como se lee en las tarjetas de
+ * producto. Devuelve cadena vacía para un `productType` desconocido, para que
+ * quien lo pinte no tenga que ramificar.
+ */
+export const unitLabel = (productType: ProductType): string => {
+    switch (productType) {
+        case "kg":
+        case "m-kg":
+            return "/Kg";
+        case "100g":
+            return "/100 gramos";
+        case "p":
+            return "/pieza";
+        default:
+            return "";
+    }
+};
+
 export const discountPercent = (price: PriceFields): number => {
     const base = basePrice(price);
     const rowprice = price.rowprice || 0;

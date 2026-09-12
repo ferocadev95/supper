@@ -5,16 +5,11 @@ import Pagination from "../../../../components/Pagination";
 import Container from "../../../../components/Container";
 import ProductList from "../../../../components/ProductList";
 import SidebarExpanded from "../../../../components/SidebarExpanded";
-import { searchProducts } from "../../../../lib/search";
+import { SEARCH_FETCH_LIMIT, searchProducts } from "../../../../lib/search";
 
 const PROJECTION = `{
     ...
 }`;
-
-// Tope al traer el catálogo completo para buscar en Node. Holgado para el
-// catálogo actual; si creciera por encima, tocaría desnormalizar un campo de
-// búsqueda en el schema de Sanity.
-const SEARCH_FETCH_LIMIT = 1000;
 
 interface Props {
     searchParams: Promise<{

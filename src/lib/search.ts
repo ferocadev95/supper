@@ -7,6 +7,14 @@ export interface SearchableProduct {
   productCategory?: string;
 }
 
+/**
+ * Tope al traer el catálogo completo para buscar en Node. Holgado para el
+ * catálogo actual; si creciera por encima, tocaría desnormalizar un campo de
+ * búsqueda en el schema de Sanity. Lo comparten la página de productos y el
+ * endpoint de sugerencias, que rankean sobre el mismo conjunto.
+ */
+export const SEARCH_FETCH_LIMIT = 1000;
+
 const BRAND_LABELS = new Map(
   SEARCHABLE_BRANDS.map(({ value, label }) => [value, label])
 );
