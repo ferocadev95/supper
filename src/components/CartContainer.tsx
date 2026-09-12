@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { getReservationsData } from "../server/actions/get-reservations-data";
 import { getCartPricing } from "../server/pricing";
 import { PriceFields, computeCartTotals } from "../lib/pricing";
+import { PICKUP_ENABLED } from "../lib/shipping";
 
 interface Props {
     session?: Session;
@@ -32,7 +33,10 @@ const CartContainer = ({ session }: Props) => {
     const [pickupLocation, setPickupLocation] = useState<"Bona" | "Parroquia">(
         "Bona"
     );
-    const [selectedHour, setSelectedHour] = useState<string>("8:00-9:00");
+    // Tiene que ser una franja real de `possibleHours`: es la que se consulta
+    // para la disponibilidad y la que viaja al checkout si el usuario no toca
+    // ningún botón, y el endpoint rechaza cualquier valor fuera de la lista.
+    const [selectedHour, setSelectedHour] = useState<string>("9:00-10:00");
     const [reservations, setReservations] = useState<Array<Reservation>>();
     const [clientHasReserved, setClientHasReserved] = useState<boolean>(false);
     const [pricing, setPricing] = useState<Record<string, PriceFields>>({});
@@ -195,27 +199,32 @@ const CartContainer = ({ session }: Props) => {
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-y-4 mb-4">
-                                <p>Selecciona el método de envío:</p>
-                                <div className="flex items-center gap-x-3">
-                                    <button
-                                        onClick={() => {
-                                            setShippingMethod("domicilio");
-                                        }}
-                                        className={`px-6 py-3 font-semibold text-gray-700 border-[1px] rounded-md hoverEffect ${shippingMethod === "domicilio" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
-                                    >
-                                        A Domicilio
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setShippingMethod("pickup");
-                                        }}
-                                        className={`px-6 py-3 font-semibold border-[1px] rounded-md text-gray-700 hoverEffect ${shippingMethod === "pickup" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
-                                    >
-                                        Pick & Go
-                                    </button>
+                            {/* Con el Pick & Go apagado no hay nada que elegir:
+                                el selector desaparece y el carrito va siempre
+                                por la rama de domicilio. */}
+                            {PICKUP_ENABLED && (
+                                <div className="flex flex-col gap-y-4 mb-4">
+                                    <p>Selecciona el método de envío:</p>
+                                    <div className="flex items-center gap-x-3">
+                                        <button
+                                            onClick={() => {
+                                                setShippingMethod("domicilio");
+                                            }}
+                                            className={`px-6 py-3 font-semibold text-gray-700 border-[1px] rounded-md hoverEffect ${shippingMethod === "domicilio" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
+                                        >
+                                            A Domicilio
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setShippingMethod("pickup");
+                                            }}
+                                            className={`px-6 py-3 font-semibold border-[1px] rounded-md text-gray-700 hoverEffect ${shippingMethod === "pickup" ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50 hover:bg-gray-200"}`}
+                                        >
+                                            Pick & Go
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                             {shippingMethod === "domicilio" && (
                                 <>
                                     <div>
@@ -275,7 +284,7 @@ const CartContainer = ({ session }: Props) => {
                                     )}
                                 </>
                             )}
-                            {shippingMethod === "pickup" && (
+                            {PICKUP_ENABLED && shippingMethod === "pickup" && (
                                 <div className="flex flex-col gap-y-3 mb-4">
                                     <p>
                                         Lugar de recolección:

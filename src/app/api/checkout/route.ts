@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { auth } from "../../../../auth";
 import { resolveOrder, SlimLine } from "../../../server/pricing";
+import { PICKUP_ENABLED } from "../../../lib/shipping";
 
 const predefinedHours = [
     "9:00-10:00",
@@ -47,6 +48,17 @@ export const POST = async (req: NextRequest) => {
         const reqBody = await req.json();
         const { lines, zipCode, shippingMethod, pickupLocation, selectedHour } =
             reqBody;
+
+        // La UI ya oculta el Pick & Go, pero una pestaña vieja o una llamada
+        // directa podrían seguir mandando `pickup`.
+        if (!PICKUP_ENABLED && shippingMethod !== "domicilio") {
+            return NextResponse.json(
+                {
+                    error: "Pick & Go no está disponible por el momento. Selecciona entrega a domicilio.",
+                },
+                { status: 400 }
+            );
+        }
 
         if (!zipCode && !pickupLocation) {
             return NextResponse.json(
