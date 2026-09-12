@@ -3,18 +3,13 @@ import Stripe from "stripe";
 import { auth } from "../../../../auth";
 import { resolveOrder, SlimLine } from "../../../server/pricing";
 import { PICKUP_ENABLED } from "../../../lib/shipping";
-
-const predefinedHours = [
-    "9:00-10:00",
-    "10:00-11:00",
-    "11:00-12:00",
-    "12:00-13:00",
-    "13:00-14:00",
-    "14:00-15:00",
-    "15:00-16:00",
-    "16:00-17:00",
-    "17:00-18:00",
-];
+import {
+    SLOT_CAPACITY,
+    isValidDeliveryDate,
+    isValidSlot,
+    todayISO,
+} from "../../../lib/delivery";
+import { readSlotAvailability } from "../../../server/delivery-slots";
 
 export const POST = async (req: NextRequest) => {
     const allowedZipCodes = [
@@ -26,7 +21,10 @@ export const POST = async (req: NextRequest) => {
         "52989",
         "54578",
     ];
-    const today = new Date().toLocaleDateString("es-MX").split("T")[0];
+    // Fecha de compra, en el calendario de CDMX. Antes se calculaba con la
+    // zona del servidor, así que un pedido de la noche podía registrarse con
+    // la fecha del día siguiente.
+    const today = todayISO();
 
     if (!process.env.STRIPE_SECRET_KEY) {
         throw new Error("Missing Stripe Secret Key");
@@ -46,8 +44,14 @@ export const POST = async (req: NextRequest) => {
         }
 
         const reqBody = await req.json();
-        const { lines, zipCode, shippingMethod, pickupLocation, selectedHour } =
-            reqBody;
+        const {
+            lines,
+            zipCode,
+            shippingMethod,
+            pickupLocation,
+            selectedHour,
+            deliveryDate,
+        } = reqBody;
 
         // La UI ya oculta el Pick & Go, pero una pestaña vieja o una llamada
         // directa podrían seguir mandando `pickup`.
@@ -93,10 +97,60 @@ export const POST = async (req: NextRequest) => {
                 );
             }
 
-            if (!predefinedHours.includes(selectedHour)) {
+            if (!isValidSlot(selectedHour)) {
                 return NextResponse.json(
                     { error: "Se ha seleccionado una hora inválida." },
                     { status: 400 }
+                );
+            }
+
+            if (!deliveryDate) {
+                return NextResponse.json(
+                    {
+                        error: "Se requiere una fecha para la entrega a domicilio.",
+                    },
+                    { status: 400 }
+                );
+            }
+
+            // Se recalcula el rango aquí: la lista de días que vio el carrito
+            // pudo quedar vieja en una pestaña abierta desde ayer, y sábados,
+            // domingos y el mismo día nunca son entregables.
+            if (!isValidDeliveryDate(deliveryDate)) {
+                return NextResponse.json(
+                    {
+                        error: "La fecha de entrega seleccionada no está disponible. Vuelve a elegir un día.",
+                    },
+                    { status: 400 }
+                );
+            }
+
+            // El cupo se comprueba también aquí, no sólo en el carrito: el
+            // botón deshabilitado no detiene una llamada directa a la API ni
+            // a dos clientes que eligen la última plaza a la vez. Es el
+            // último punto antes de cobrar, así que es donde tiene que
+            // rechazarse; después del pago ya no se puede decir que no.
+            const availability = await readSlotAvailability({
+                clientId,
+                deliveryDate,
+                slot: selectedHour,
+            });
+
+            if (availability.clientHasReserved) {
+                return NextResponse.json(
+                    {
+                        error: "Ya tienes un pedido programado en ese horario. Elige otra franja u otro día.",
+                    },
+                    { status: 409 }
+                );
+            }
+
+            if (availability.reservations.length >= SLOT_CAPACITY) {
+                return NextResponse.json(
+                    {
+                        error: "Ese horario acaba de llenarse. Por favor elige otra franja u otro día.",
+                    },
+                    { status: 409 }
                 );
             }
         }
@@ -117,14 +171,19 @@ export const POST = async (req: NextRequest) => {
             phone_number_collection: {
                 enabled: true,
             },
-            success_url: `${origin}/success/?session_id={CHECKOUT_SESSION_ID}&client_id=${clientId}&shipping_method=${shippingMethod}&selected_hour=${selectedHour}`,
+            success_url: `${origin}/success/?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/cancel/?cancelled=true`,
             metadata: {
                 email,
                 pickupLocation,
                 shippingMethod,
+                // `date` es la fecha de compra y se conserva con ese
+                // significado; `deliveryDate` es la que el cliente eligió para
+                // recibir, en ISO para poder ordenarla y compararla.
                 date: today,
                 schedule: shippingMethod === "domicilio" ? selectedHour : null,
+                deliveryDate:
+                    shippingMethod === "domicilio" ? deliveryDate : null,
             },
             shipping_address_collection: {
                 allowed_countries: shippingMethod === "domicilio" ? ["MX"] : [],

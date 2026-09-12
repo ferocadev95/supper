@@ -17,6 +17,7 @@ vi.mock("../server/actions/get-reservations-data", () => ({
     getReservationsData: vi.fn(async () => ({
         clientHasReserved: false,
         reservations: [],
+        isAvailable: true,
     })),
 }));
 vi.mock("../sanity/lib/image", () => ({

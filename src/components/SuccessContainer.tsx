@@ -13,7 +13,6 @@ import {
     HiXCircle,
 } from "react-icons/hi";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import FormattedPrice from "./FormattedPrice";
 import { computeCartTotals } from "../lib/pricing";
 
@@ -26,7 +25,6 @@ const SuccessContainer = ({
 }) => {
     const { cartItems } = useSelector((state: StoreState) => state?.cart);
     const dispatch = useDispatch();
-    const searchParams = useSearchParams();
     const { data: session, status } = useSession();
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
@@ -38,10 +36,6 @@ const SuccessContainer = ({
     // a disparar el efecto, dejando la página en el loader para siempre.
     const processedRef = useRef<boolean>(false);
 
-    const shippingMethod = searchParams.get("shipping_method")?.toString();
-    const selectedHour = searchParams.get("selected_hour")?.toString();
-    const clientId = searchParams.get("client_id")?.toString();
-
     // Local estimate shown before the server responds; the authoritative total
     // returned by /api/saveorder replaces it once the order is persisted.
     useEffect(() => {
@@ -52,15 +46,15 @@ const SuccessContainer = ({
         setTotalAmount(total);
     }, [cartItems]);
 
+    // El método de envío, el día y la franja los resuelve el servidor leyendo
+    // la sesión de Stripe: antes viajaban por la URL, donde el cliente podía
+    // cambiarlos después de pagar.
     const handleReservation = async () => {
         try {
             const response = await fetch("/api/reserve", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    clientId,
-                    selectedHour,
-                }),
+                body: JSON.stringify({ sessionId: id }),
             });
 
             if (!response.ok) {
@@ -115,9 +109,7 @@ const SuccessContainer = ({
                 processedRef.current = true;
                 setLoading(true);
                 try {
-                    if (shippingMethod === "domicilio") {
-                        await handleReservation();
-                    }
+                    await handleReservation();
                     await handleSaveOrder();
                 } catch (error) {
                     console.log(error);

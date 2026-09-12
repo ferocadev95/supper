@@ -1,73 +1,51 @@
 "use server";
 
-import { adminDB } from "../../../firebaseAdmin";
-
-interface Reservation {
-    clientId: string;
-}
-
-interface HourData {
-    reservations?: Reservation[];
-    lastReset?: string;
-}
+import {
+    readSlotAvailability,
+    type Reservation,
+} from "../delivery-slots";
+import { isValidDeliveryDate, isValidSlot } from "../../lib/delivery";
 
 interface Props {
     clientId: string;
+    deliveryDate: string;
     selectedHour: string;
 }
 
+/**
+ * Disponibilidad de una franja en una fecha, para el carrito.
+ *
+ * El modelo anterior guardaba un documento por franja (`hours/{franja}`) y lo
+ * vaciaba cuando cambiaba el día, así que sólo podía representar "hoy". Con
+ * entregas programadas hasta ocho días hábiles adelante cada par
+ * (fecha, franja) necesita su propio documento: no hay nada que resetear,
+ * porque un documento de una fecha pasada simplemente deja de consultarse.
+ */
 export const getReservationsData = async ({
     clientId,
+    deliveryDate,
     selectedHour,
 }: Props) => {
-    const today = new Date()
-        .toLocaleDateString("es-MX", { timeZone: "America/Mexico_City" })
-        .split("T")[0]; // Get current date as YYYY-MM-DD
+    if (!isValidDeliveryDate(deliveryDate) || !isValidSlot(selectedHour)) {
+        // Una fecha fuera de rango no tiene cupo que consultar; se informa como
+        // no disponible en vez de crear documentos basura.
+        return {
+            deliveryDate,
+            selectedHour,
+            reservations: [] as Reservation[],
+            clientHasReserved: false,
+            isAvailable: false,
+        };
+    }
 
     try {
-        // Reset all hours if it's a new day
-        const hoursCollectionRef = adminDB.collection("hours");
-        const hoursQuerySnapshot = await hoursCollectionRef.get();
+        const availability = await readSlotAvailability({
+            clientId,
+            deliveryDate,
+            slot: selectedHour,
+        });
 
-        for (const docSnap of hoursQuerySnapshot.docs) {
-            const hourData = docSnap.data() as HourData;
-            const mexicoCityTime = new Date().toLocaleString("es-MX", {
-                timeZone: "America/Mexico_City",
-            });
-            const isSunday = new Date(mexicoCityTime).getDay() === 7; // 6 represents Saturday
-            if (hourData.lastReset !== today && !isSunday) {
-                await docSnap.ref.update({
-                    reservations: [],
-                    lastReset: today, // Reset total orders
-                });
-            }
-        }
-
-        // Proceed with reservation logic for the requested hour
-        const hourDocRef = adminDB.collection("hours").doc(selectedHour);
-        const hourDocSnap = await hourDocRef.get();
-
-        // If the document does not exist, initialize it
-        if (!hourDocSnap.exists) {
-            await hourDocRef.set({
-                reservations: [],
-                lastReset: today,
-            });
-        }
-
-        const hourData = (await hourDocRef.get()).data() as HourData;
-        const reservations = hourData.reservations || [];
-
-        // Check if the client has already reserved this hour
-        const clientHasReserved = reservations.some(
-            (reservation) => reservation.clientId === clientId
-        );
-
-        return {
-            selectedHour,
-            reservations,
-            clientHasReserved,
-        };
+        return { deliveryDate, selectedHour, ...availability };
     } catch (error) {
         console.error(error);
         throw new Error(

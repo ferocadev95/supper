@@ -15,13 +15,14 @@ import { getReservationsData } from "../server/actions/get-reservations-data";
 import { getCartPricing } from "../server/pricing";
 import { PriceFields, computeCartTotals } from "../lib/pricing";
 import { PICKUP_ENABLED } from "../lib/shipping";
+import {
+    DELIVERY_SLOTS,
+    formatDeliveryDateShort,
+    getDeliveryDates,
+} from "../lib/delivery";
 
 interface Props {
     session?: Session;
-}
-
-interface Reservation {
-    clientId: string;
 }
 
 const CartContainer = ({ session }: Props) => {
@@ -33,12 +34,22 @@ const CartContainer = ({ session }: Props) => {
     const [pickupLocation, setPickupLocation] = useState<"Bona" | "Parroquia">(
         "Bona"
     );
-    // Tiene que ser una franja real de `possibleHours`: es la que se consulta
+    // Tiene que ser una franja real de `DELIVERY_SLOTS`: es la que se consulta
     // para la disponibilidad y la que viaja al checkout si el usuario no toca
     // ningún botón, y el endpoint rechaza cualquier valor fuera de la lista.
-    const [selectedHour, setSelectedHour] = useState<string>("9:00-10:00");
-    const [reservations, setReservations] = useState<Array<Reservation>>();
-    const [clientHasReserved, setClientHasReserved] = useState<boolean>(false);
+    const [selectedHour, setSelectedHour] = useState<string>(
+        DELIVERY_SLOTS[0].value
+    );
+    // Los días se calculan una sola vez al montar: si se recalcularan en cada
+    // render, la lista cambiaría bajo los pies del usuario al cruzar la
+    // medianoche y podría dejar seleccionado un día que ya no se ofrece.
+    const [deliveryDates] = useState<string[]>(() => getDeliveryDates());
+    const [deliveryDate, setDeliveryDate] = useState<string>(
+        () => deliveryDates[0]
+    );
+    // La capacidad de la franja la decide el servidor (`SLOT_CAPACITY`); aquí
+    // sólo se refleja para no tener el número repetido en dos sitios.
+    const [slotAvailable, setSlotAvailable] = useState<boolean>(true);
     const [pricing, setPricing] = useState<Record<string, PriceFields>>({});
     const { cartItems } = useSelector((state: StoreState) => state?.cart);
     const dispatch = useDispatch();
@@ -47,19 +58,6 @@ const CartContainer = ({ session }: Props) => {
     // snapshot as a fallback while it loads.
     const priceFor = (item: (typeof cartItems)[number]): PriceFields =>
         pricing[item._id] ?? item;
-
-    // TODO: Possible validation
-    const possibleHours = [
-        { hour: "De 9:00 a 10:00 am", value: "9:00-10:00" },
-        { hour: "De 10:00 a 11:00 am", value: "10:00-11:00" },
-        { hour: "De 11:00 a 12:00 pm", value: "11:00-12:00" },
-        { hour: "De 12:00 a 13:00 pm", value: "12:00-13:00" },
-        { hour: "De 13:00 a 14:00 pm", value: "13:00-14:00" },
-        { hour: "De 14:00 a 15:00 pm", value: "14:00-15:00" },
-        { hour: "De 15:00 a 16:00 pm", value: "15:00-16:00" },
-        { hour: "De 16:00 a 17:00 pm", value: "16:00-17:00" },
-    ];
-    // TODO: Change error handling from checkout for reserve if needed. This with the hours.
 
     const clientId = session?.user?.id;
 
@@ -98,10 +96,10 @@ const CartContainer = ({ session }: Props) => {
                 if (clientId) {
                     const data = await getReservationsData({
                         clientId,
+                        deliveryDate,
                         selectedHour,
                     });
-                    setClientHasReserved(data?.clientHasReserved);
-                    setReservations(data?.reservations);
+                    setSlotAvailable(Boolean(data?.isAvailable));
                 }
             } catch (error) {
                 console.error("Error fetching reservations data", error);
@@ -109,7 +107,7 @@ const CartContainer = ({ session }: Props) => {
         };
 
         fetchReservationsData();
-    }, [clientId, selectedHour]);
+    }, [clientId, deliveryDate, selectedHour]);
 
     const handleResetCart = () => {
         const confirmed = window.confirm(
@@ -140,6 +138,7 @@ const CartContainer = ({ session }: Props) => {
                 shippingMethod,
                 pickupLocation,
                 selectedHour,
+                deliveryDate,
             }),
         });
         const { url, error } = await response.json();
@@ -228,16 +227,33 @@ const CartContainer = ({ session }: Props) => {
                             {shippingMethod === "domicilio" && (
                                 <>
                                     <div>
-                                        <p>Selecciona un horario:</p>
+                                        <p>Selecciona el día de entrega:</p>
                                         <p className="text-gray-500 text-sm">
-                                            Los pedidos se entregan al día hábil
-                                            siguiente. Días de entrega: Lunes a
-                                            Sábado. Horarios de entrega: 9:00 am
-                                            a 17:00 pm.
+                                            Entregamos a partir del siguiente
+                                            día hábil y puedes programar tu
+                                            pedido hasta 8 días hábiles
+                                            adelante. Días de entrega: Lunes a
+                                            Viernes. Horarios de entrega: 9:00
+                                            am a 17:00 pm.
                                         </p>
                                     </div>
+                                    <div className="grid grid-cols-2 gap-2 items-center">
+                                        {deliveryDates.map((date) => (
+                                            <button
+                                                onClick={() => {
+                                                    setDeliveryDate(date);
+                                                }}
+                                                disabled={!session?.user}
+                                                key={date}
+                                                className={`px-3 py-1 border-[1px] capitalize disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-300/50 disabled:text-gray-400 text-gray-700 hoverEffect font-semibold rounded-md ${deliveryDate === date ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50"}`}
+                                            >
+                                                {formatDeliveryDateShort(date)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p>Selecciona un horario:</p>
                                     <div className="grid grid-cols-2 gap-2 items-center ">
-                                        {possibleHours.map((item) => (
+                                        {DELIVERY_SLOTS.map((item) => (
                                             <button
                                                 onClick={() => {
                                                     setSelectedHour(item.value);
@@ -246,21 +262,19 @@ const CartContainer = ({ session }: Props) => {
                                                 key={item.value}
                                                 className={`px-3 py-1 border-[1px] disabled:cursor-not-allowed disabled:bg-gray-100 disabled:border-gray-300/50 disabled:text-gray-400 text-gray-700 hoverEffect font-semibold rounded-md ${selectedHour === item.value ? "border-primaryGreen bg-primaryGreen/10" : "bg-gray-100 border-gray-300/50"}`}
                                             >
-                                                {item.hour}
+                                                {item.label}
                                             </button>
                                         ))}
                                     </div>
                                     {session?.user && (
                                         <>
-                                            {clientHasReserved ||
-                                            (Array.isArray(reservations) &&
-                                                reservations.length >= 2) ? (
-                                                <p className="text-red-500">
-                                                    Horario no disponible
-                                                </p>
-                                            ) : (
+                                            {slotAvailable ? (
                                                 <p className="text-green-500">
                                                     Horario disponible
+                                                </p>
+                                            ) : (
+                                                <p className="text-red-500">
+                                                    Horario no disponible
                                                 </p>
                                             )}
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-1 items-center mb-2">
@@ -289,8 +303,8 @@ const CartContainer = ({ session }: Props) => {
                                     <p>
                                         Lugar de recolección:
                                         <span className="text-sm text-gray-500 block">
-                                            Los pedidos se entregan de de 9:00
-                                            am a 17:00 pm. De Lunes a Sábado.
+                                            Los pedidos se entregan de 9:00 am a
+                                            17:00 pm. De Lunes a Viernes.
                                         </span>
                                     </p>
                                     <div className="flex items-center gap-x-3">
@@ -346,9 +360,7 @@ const CartContainer = ({ session }: Props) => {
                                 disabled={
                                     !session?.user ||
                                     (shippingMethod === "domicilio" &&
-                                        (clientHasReserved ||
-                                            (Array.isArray(reservations) &&
-                                                reservations.length >= 2)))
+                                        !slotAvailable)
                                 }
                                 className="py-3 px-8"
                                 onClick={handleCheckout}

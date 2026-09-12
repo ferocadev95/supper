@@ -1,6 +1,11 @@
 import getResend from "./getResend";
 import { VerifyEmailTemplate } from "../components/emails/VerifyEmailTemplate";
 import { ResetPasswordTemplate } from "../components/emails/ResetPasswordTemplate";
+import {
+  OrderConfirmationTemplate,
+  type OrderConfirmationTemplateProps,
+} from "../components/emails/OrderConfirmationTemplate";
+import { formatDeliveryDate } from "./delivery";
 
 // Remitente configurable. En dev, sin dominio verificado en Resend, usa
 // EMAIL_FROM="onboarding@resend.dev" (solo envía a tu propio correo de Resend).
@@ -61,5 +66,45 @@ export async function sendPasswordResetEmail(
   if (error) {
     console.error("Error enviando correo de restablecimiento:", error);
     throw new Error("No se pudo enviar el correo de restablecimiento");
+  }
+}
+
+// Copia interna de cada pedido. Sin la variable definida sólo se avisa al
+// cliente, así que en desarrollo no hace falta configurar nada.
+const ORDER_NOTIFICATIONS_EMAIL = process.env.ORDER_NOTIFICATIONS_EMAIL;
+
+interface OrderConfirmationArgs extends OrderConfirmationTemplateProps {
+  to: string;
+}
+
+/**
+ * Confirmación del pedido con su detalle y su fecha de entrega.
+ *
+ * Quien llama decide qué hacer con el fallo: el pedido ya está cobrado y
+ * guardado cuando esto se ejecuta, así que un error de Resend no debe
+ * deshacerlo.
+ */
+export async function sendOrderConfirmationEmail({
+  to,
+  ...order
+}: OrderConfirmationArgs): Promise<void> {
+  const resend = getResend();
+
+  const when = order.deliveryDate
+    ? ` · entrega ${formatDeliveryDate(order.deliveryDate)}`
+    : "";
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to,
+    // La copia va en bcc para que el cliente no vea el correo interno.
+    ...(ORDER_NOTIFICATIONS_EMAIL ? { bcc: [ORDER_NOTIFICATIONS_EMAIL] } : {}),
+    subject: `Confirmación de tu pedido - Frutivida${when}`,
+    react: OrderConfirmationTemplate(order),
+  });
+
+  if (error) {
+    console.error("Error enviando la confirmación del pedido:", error);
+    throw new Error("No se pudo enviar la confirmación del pedido");
   }
 }
