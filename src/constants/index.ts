@@ -40,11 +40,11 @@ const NON_BRANDS_IN_SEARCH = ["natural", "variado"];
 
 // Las mismas marcas que el sidebar ha mostrado siempre, en el mismo orden.
 export const SIDEBAR_BRANDS = PRODUCT_BRANDS.filter(
-  (brand) => !NON_BRANDS_IN_FILTERS.includes(brand.value)
+  (brand) => !NON_BRANDS_IN_FILTERS.includes(brand.value),
 );
 
 export const SEARCHABLE_BRANDS = PRODUCT_BRANDS.filter(
-  (brand) => !NON_BRANDS_IN_SEARCH.includes(brand.value)
+  (brand) => !NON_BRANDS_IN_SEARCH.includes(brand.value),
 );
 
 export const navBarList = [
@@ -101,7 +101,7 @@ export const footerData = [
           },
           {
             name: "Contacto",
-            link: "https://wa.me/525652588800",
+            link: "https://wa.me/525610719284",
           },
         ],
       },
