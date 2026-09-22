@@ -15,8 +15,9 @@ import type { ResolvedItem } from "../../server/pricing";
 import { formatDeliveryDate, slotLabel } from "../../lib/delivery";
 import { describeQuantity, formatAddress, money } from "./format";
 
-export interface OrderConfirmationTemplateProps {
+export interface NewOrderAdminTemplateProps {
     orderId: string;
+    customerEmail: string;
     items: ResolvedItem[];
     subtotal: number;
     shipping: number;
@@ -29,8 +30,9 @@ export interface OrderConfirmationTemplateProps {
     phoneNumber: string | null;
 }
 
-export function OrderConfirmationTemplate({
+export function NewOrderAdminTemplate({
     orderId,
+    customerEmail,
     items,
     subtotal,
     shipping,
@@ -41,7 +43,7 @@ export function OrderConfirmationTemplate({
     pickupLocation,
     address,
     phoneNumber,
-}: Readonly<OrderConfirmationTemplateProps>): React.ReactElement {
+}: Readonly<NewOrderAdminTemplateProps>): React.ReactElement {
     const isPickup = shippingMethod === "pickup";
     const formattedDate = deliveryDate ? formatDeliveryDate(deliveryDate) : "";
     const formattedAddress = formatAddress(address);
@@ -50,16 +52,14 @@ export function OrderConfirmationTemplate({
         <Html>
             <Head />
             <Preview>
-                {formattedDate
-                    ? `Tu pedido llega el ${formattedDate}`
-                    : "Confirmación de tu pedido"}
+                {`Nueva venta de ${money(total)} · ${customerEmail}`}
             </Preview>
             <Tailwind>
-                <Heading className="mx-0 my-[30px] p-0 text-center text-3xl font-bold text-black">
-                    🍅 ¡Gracias por tu compra! 🍅
+                <Heading className="mx-0 my-[24px] p-0 text-center text-2xl font-bold text-black">
+                    🛒 Nueva venta
                 </Heading>
                 <Text className="text-center text-base text-black">
-                    Recibimos tu pedido y ya lo estamos preparando.
+                    {money(total)} · {customerEmail}
                 </Text>
 
                 <Section className="my-[24px] rounded-lg bg-[#f3f7ec] p-[16px]">
@@ -67,7 +67,7 @@ export function OrderConfirmationTemplate({
                         as="h2"
                         className="m-0 mb-[8px] text-lg font-semibold text-[#4c711e]"
                     >
-                        {isPickup ? "Tu recolección" : "Tu entrega"}
+                        {isPickup ? "Recolección" : "Entrega"}
                     </Heading>
                     {formattedDate ? (
                         <Text className="m-0 text-base capitalize text-black">
@@ -89,8 +89,20 @@ export function OrderConfirmationTemplate({
                             {formattedAddress}
                         </Text>
                     ) : null}
+                </Section>
+
+                <Heading
+                    as="h2"
+                    className="mb-[8px] text-lg font-semibold text-black"
+                >
+                    Cliente
+                </Heading>
+                <Section>
+                    <Text className="m-0 text-sm text-black">
+                        {customerEmail}
+                    </Text>
                     {phoneNumber ? (
-                        <Text className="m-0 text-sm text-gray-600">
+                        <Text className="m-0 text-sm text-black">
                             Tel. {phoneNumber}
                         </Text>
                     ) : null}
@@ -98,7 +110,7 @@ export function OrderConfirmationTemplate({
 
                 <Heading
                     as="h2"
-                    className="mb-[8px] text-lg font-semibold text-black"
+                    className="mb-[8px] mt-[16px] text-lg font-semibold text-black"
                 >
                     Productos
                 </Heading>
@@ -166,8 +178,7 @@ export function OrderConfirmationTemplate({
                 <Hr className="my-[16px] border-gray-300" />
 
                 <Text className="text-center text-xs text-gray-500">
-                    Pedido {orderId.slice(-10)}. Si algo no coincide, por favor 
-                    contacta a servicio a clientes.
+                    Pedido {orderId}
                 </Text>
             </Tailwind>
         </Html>

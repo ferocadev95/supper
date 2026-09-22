@@ -5,7 +5,12 @@ import {
   OrderConfirmationTemplate,
   type OrderConfirmationTemplateProps,
 } from "../components/emails/OrderConfirmationTemplate";
+import {
+  NewOrderAdminTemplate,
+  type NewOrderAdminTemplateProps,
+} from "../components/emails/NewOrderAdminTemplate";
 import { formatDeliveryDate } from "./delivery";
+import { getAdminEmails } from "./admin-emails";
 
 // Remitente configurable. En dev, sin dominio verificado en Resend, usa
 // EMAIL_FROM="onboarding@resend.dev" (solo envía a tu propio correo de Resend).
@@ -69,10 +74,6 @@ export async function sendPasswordResetEmail(
   }
 }
 
-// Copia interna de cada pedido. Sin la variable definida sólo se avisa al
-// cliente, así que en desarrollo no hace falta configurar nada.
-const ORDER_NOTIFICATIONS_EMAIL = process.env.ORDER_NOTIFICATIONS_EMAIL;
-
 interface OrderConfirmationArgs extends OrderConfirmationTemplateProps {
   to: string;
 }
@@ -97,8 +98,6 @@ export async function sendOrderConfirmationEmail({
   const { error } = await resend.emails.send({
     from: FROM,
     to,
-    // La copia va en bcc para que el cliente no vea el correo interno.
-    ...(ORDER_NOTIFICATIONS_EMAIL ? { bcc: [ORDER_NOTIFICATIONS_EMAIL] } : {}),
     subject: `Confirmación de tu pedido - Frutivida${when}`,
     react: OrderConfirmationTemplate(order),
   });
@@ -107,4 +106,43 @@ export async function sendOrderConfirmationEmail({
     console.error("Error enviando la confirmación del pedido:", error);
     throw new Error("No se pudo enviar la confirmación del pedido");
   }
+}
+
+const money = (amount: number) =>
+  amount.toLocaleString("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 2,
+  });
+
+/**
+ * Aviso interno de venta. Sin `ORDER_NOTIFICATIONS_EMAIL` configurada no hay
+ * destinatarios: devuelve `false` y no envía nada.
+ */
+export async function sendNewOrderAdminEmail(
+  order: NewOrderAdminTemplateProps,
+): Promise<boolean> {
+  const admins = getAdminEmails();
+  if (admins.length === 0) return false;
+
+  const resend = getResend();
+
+  const when = order.deliveryDate
+    ? ` · entrega ${formatDeliveryDate(order.deliveryDate)}`
+    : "";
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: admins,
+    replyTo: order.customerEmail,
+    subject: `Nueva venta ${money(order.total)} - ${order.customerEmail}${when}`,
+    react: NewOrderAdminTemplate(order),
+  });
+
+  if (error) {
+    console.error("Error enviando el aviso de venta a administradores:", error);
+    throw new Error("No se pudo enviar el aviso de venta");
+  }
+
+  return true;
 }

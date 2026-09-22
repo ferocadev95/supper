@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../../../auth";
 import { resolveOrder, SlimLine } from "../../../server/pricing";
 import { loadOrderSession } from "../../../server/order-session";
-import { sendOrderConfirmationEmail } from "../../../lib/send-email";
+import {
+    sendNewOrderAdminEmail,
+    sendOrderConfirmationEmail,
+} from "../../../lib/send-email";
 
 export const POST = async (req: NextRequest) => {
     try {
@@ -82,7 +85,44 @@ export const POST = async (req: NextRequest) => {
         // Se lee antes de escribir para no reenviar el correo si el cliente
         // recarga `/success` con el carrito todavía lleno.
         const alreadyNotified = Boolean(userDoc?.data()?.value?.emailSentAt);
+        const adminsAlreadyNotified = Boolean(
+            userDoc?.data()?.value?.adminEmailSentAt
+        );
         await userOrderReference.set({ value: orderItem }, { merge: true });
+
+        if (!adminsAlreadyNotified) {
+            try {
+                const sent = await sendNewOrderAdminEmail({
+                    orderId: id,
+                    customerEmail: email,
+                    items: resolvedItems,
+                    subtotal,
+                    shipping,
+                    total,
+                    deliveryDate: order.deliveryDate,
+                    deliverySlot: order.deliverySlot,
+                    shippingMethod: order.shippingMethod,
+                    pickupLocation: order.pickupLocation,
+                    address: order.address,
+                    phoneNumber: phone,
+                });
+                if (sent) {
+                    await userOrderReference.set(
+                        {
+                            value: {
+                                adminEmailSentAt: new Date().toISOString(),
+                            },
+                        },
+                        { merge: true }
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    "Error enviando el aviso de venta a administradores:",
+                    error
+                );
+            }
+        }
 
         if (!alreadyNotified) {
             // El pedido ya está guardado: un fallo del proveedor de correo no
