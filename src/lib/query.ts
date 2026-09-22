@@ -20,10 +20,15 @@ const categoriesQuery = groq`*[_type == "category"] {
 ...
 }|order(_createdAt asc)`;
 
+const categoryProductsQuery = groq`*[_type == "product" && productCategory == $categoria] {
+    ...
+}|order(_createdAt asc) [$start...$end]`;
+
 export {
   bannerQuery,
   productsQuery,
   bestSellerQuery,
   offersQuery,
   categoriesQuery,
+  categoryProductsQuery,
 };
