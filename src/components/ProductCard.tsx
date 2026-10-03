@@ -3,8 +3,7 @@ import { ProductData } from "../../types";
 import Image from "next/image";
 import { urlFor } from "../sanity/lib/image";
 import FormattedPrice from "./FormattedPrice";
-import AddToCartButton from "./AddToCartButton";
-import SeeProductButton from "./SeeProductButton";
+import ProductCardActions from "./ProductCardActions";
 import { Badge } from "./ui";
 import DiscountBadge from "./DiscountBadge";
 
@@ -143,11 +142,7 @@ const ProductCard = ({ item }: { item: ProductData }) => {
                 </div>
                 <DiscountBadge price={item} />
             </div>
-            {item?.productType !== "p" ? (
-                <SeeProductButton item={item} />
-            ) : (
-                <AddToCartButton item={item} />
-            )}
+            <ProductCardActions item={item} />
         </div>
     );
 };

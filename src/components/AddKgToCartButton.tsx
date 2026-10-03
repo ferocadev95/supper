@@ -9,9 +9,10 @@ import KgQuantityInput from "./KgQuantityInput";
 
 interface Props {
     item: ProductData;
+    onAdded?: () => void;
 }
 
-const AddKgToCartButton = ({ item }: Props) => {
+const AddKgToCartButton = ({ item, onAdded }: Props) => {
     const dispatch = useDispatch();
     const [kgQuantity, setKgQuantity] = useState<string>("");
 
@@ -34,6 +35,7 @@ const AddKgToCartButton = ({ item }: Props) => {
         dispatch(addToCartKgQuantity({ item, kgQuantity: parsedQuantity }));
 
         toast.success(`${item?.title.substring(0, 12)} añadido al carrito`);
+        onAdded?.();
     };
     return (
         <>

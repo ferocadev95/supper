@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import reducer, {
     addToCart,
+    addToCartPieces,
     addToCartBatch,
     addToCartKgQuantity,
     addToCartFruitVegetableMature,
@@ -35,6 +36,22 @@ const makeItem = (overrides: Partial<ProductData> = {}): ProductData =>
 const initial = () => ({ cartItems: [] as ProductData[], userInfo: null as UserInfo | null });
 
 describe("cartSlice reducers", () => {
+    it("addToCartPieces inserts a new item with the given quantity", () => {
+        const state = reducer(
+            initial(),
+            addToCartPieces({ item: makeItem(), quantity: 3 })
+        );
+        expect(state.cartItems).toHaveLength(1);
+        expect(state.cartItems[0].quantity).toBe(3);
+    });
+
+    it("addToCartPieces adds onto an existing item's quantity", () => {
+        let state = reducer(initial(), addToCart(makeItem()));
+        state = reducer(state, addToCartPieces({ item: makeItem(), quantity: 4 }));
+        expect(state.cartItems).toHaveLength(1);
+        expect(state.cartItems[0].quantity).toBe(5);
+    });
+
     it("addToCart inserts a new item with quantity 1", () => {
         const state = reducer(initial(), addToCart(makeItem()));
         expect(state.cartItems).toHaveLength(1);

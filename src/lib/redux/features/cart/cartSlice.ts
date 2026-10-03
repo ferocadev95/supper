@@ -78,6 +78,25 @@ export const cartSlice = createSlice({
                 state.cartItems.push({ ...action.payload, quantity: 1 });
             }
         },
+        // Suma varias piezas de una vez (modal del ProductCard).
+        addToCartPieces: (
+            state,
+            action: PayloadAction<{ item: ProductData; quantity: number }>
+        ) => {
+            const existingItem = state.cartItems.find(
+                (item) => item._id === action.payload.item._id
+            );
+
+            if (existingItem) {
+                existingItem.quantity =
+                    (existingItem.quantity || 0) + action.payload.quantity;
+            } else {
+                state.cartItems.push({
+                    ...action.payload.item,
+                    quantity: action.payload.quantity,
+                });
+            }
+        },
         addToCartBatch: (state, action: PayloadAction<ProductData[]>) => {
             action.payload.forEach((newItem) => {
                 const existingItem = state.cartItems.find(
@@ -155,6 +174,7 @@ export const cartSlice = createSlice({
 
 export const {
     addToCart,
+    addToCartPieces,
     addToCartFruitVegetableMature,
     addToCartFruitVegetableGreen,
     addToCartBatch,
