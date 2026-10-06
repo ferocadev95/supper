@@ -187,6 +187,10 @@ export const POST = async (req: NextRequest) => {
                 schedule: shippingMethod === "domicilio" ? selectedHour : null,
                 deliveryDate:
                     shippingMethod === "domicilio" ? deliveryDate : null,
+                // El CP validado contra las zonas. La dirección la captura
+                // Stripe después; el panel compara ambos y marca el pedido
+                // como "Requiere revisión" si no coinciden.
+                zipCode: shippingMethod === "domicilio" ? zipCode : null,
             },
             shipping_address_collection: {
                 allowed_countries: shippingMethod === "domicilio" ? ["MX"] : [],

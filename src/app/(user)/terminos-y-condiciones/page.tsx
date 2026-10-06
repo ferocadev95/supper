@@ -177,6 +177,65 @@ const TerminosYCondicionesPage = () => {
                 Las localidades autorizadas para surtir el pedido se encuentran
                 dentro del Estado de México.
             </p>
+            <h4 className="font-bold">
+                Zonas de cobertura y verificación de la dirección de entrega
+            </h4>
+            <p>
+                Frutivida únicamente realiza entregas en los códigos postales
+                publicados en la sección{" "}
+                <a href="/zonas-de-entrega" className="underline">
+                    Zonas de entrega
+                </a>
+                , con el pedido mínimo y las condiciones de envío que ahí se
+                indican para cada zona.
+            </p>
+            <p>
+                El código postal que el Cliente ingresa en el carrito de compra
+                es el que se utiliza para validar la cobertura, el pedido mínimo
+                y el costo de envío. La dirección de entrega capturada al
+                momento del pago deberá corresponder a ese mismo código postal.
+                El Cliente es responsable de que la dirección, el código postal
+                y el número telefónico que proporciona sean correctos y
+                completos.
+            </p>
+            <p>
+                En caso de que el código postal de la dirección de entrega no
+                coincida con el código postal validado en el carrito, que la
+                dirección se encuentre fuera de las zonas de cobertura, o que los
+                datos de entrega sean incorrectos o incompletos, Frutivida
+                retendrá el Pedido y tratará de contactar al Cliente por
+                teléfono, WhatsApp o correo electrónico, utilizando los datos
+                proporcionados en la compra, para confirmar o corregir la
+                información. Una vez establecido el contacto, el Pedido podrá:
+            </p>
+            <ul>
+                <li>
+                    Entregarse en una dirección corregida que se encuentre
+                    dentro de las zonas de cobertura, en la fecha y horario que
+                    se acuerden con el Cliente, siempre que se cumplan el pedido
+                    mínimo y las condiciones de envío de la zona
+                    correspondiente; o
+                </li>
+                <li>
+                    Cancelarse, en cuyo caso se reembolsará el importe pagado a
+                    la misma tarjeta con la que se realizó el Pedido.
+                </li>
+            </ul>
+            <p>
+                Si Frutivida no logra contactar al Cliente dentro de los 2 (dos)
+                días hábiles siguientes a la fecha de entrega programada, podrá
+                cancelar el Pedido y reembolsar el importe pagado a la misma
+                tarjeta. Frutivida no será responsable por retrasos o por la
+                imposibilidad de realizar la entrega derivados de información
+                incorrecta, incompleta o que no corresponda al código postal
+                validado.
+            </p>
+            <p>
+                Si la entrega se intenta en la dirección proporcionada por el
+                Cliente y no puede completarse por causas imputables a éste
+                (dirección incorrecta, ausencia en el domicilio o falta de
+                respuesta), el costo de envío no será reembolsable.
+            </p>
             <p>2. Entrega Pick & Go</p>
             <p>
                 Al momento de realizar el Pedido, el Cliente puede solicitar a

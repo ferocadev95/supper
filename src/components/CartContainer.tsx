@@ -330,6 +330,16 @@ const CartContainer = ({ session }: Props) => {
                                                 zipCode={zipCode}
                                                 subtotal={totalAmount}
                                             />
+                                            {zone && (
+                                                <p className="text-xs text-gray-500">
+                                                    Al pagar, captura tu
+                                                    dirección de entrega con
+                                                    este mismo código postal
+                                                    ({zipCode}). Si no coincide,
+                                                    revisaremos tu pedido antes
+                                                    de enviarlo.
+                                                </p>
+                                            )}
                                         </>
                                     )}
                                 </>
