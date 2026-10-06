@@ -13,7 +13,13 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { getReservationsData } from "../server/actions/get-reservations-data";
 import { getCartPricing } from "../server/pricing";
-import { PriceFields, computeCartTotals } from "../lib/pricing";
+import {
+    FREE_SHIPPING_THRESHOLD,
+    PriceFields,
+    computeCartTotals,
+} from "../lib/pricing";
+import { getZoneForZip } from "../lib/zones";
+import ZipCoverageNotice from "./ZipCoverageNotice";
 import { PICKUP_ENABLED } from "../lib/shipping";
 import {
     DELIVERY_SLOTS,
@@ -89,6 +95,10 @@ const CartContainer = ({ session }: Props) => {
             quantities: item,
         }))
     );
+
+    // La zona sólo cambia el pedido mínimo; el envío es fijo para todas.
+    const zone = getZoneForZip(zipCode);
+    const meetsMinOrder = zone !== null && totalAmount >= zone.minOrder;
 
     useEffect(() => {
         const fetchReservationsData = async () => {
@@ -197,6 +207,20 @@ const CartContainer = ({ session }: Props) => {
                                         />
                                     </p>
                                 </div>
+                                <p className="mt-2 text-sm text-gray-600 text-right">
+                                    🚚 Envío GRATIS en pedidos desde{" "}
+                                    <FormattedPrice
+                                        amount={FREE_SHIPPING_THRESHOLD}
+                                        className="text-sm"
+                                    />
+                                    .{" "}
+                                    <Link
+                                        href="/zonas-de-entrega"
+                                        className="text-primaryGreen underline font-medium"
+                                    >
+                                        ¿Llegamos a tu zona?
+                                    </Link>
+                                </p>
                             </div>
                             {/* Con el Pick & Go apagado no hay nada que elegir:
                                 el selector desaparece y el carrito va siempre
@@ -287,13 +311,25 @@ const CartContainer = ({ session }: Props) => {
                                                     onChange={(e) =>
                                                         setZipCode(
                                                             e.target.value
+                                                                .replace(
+                                                                    /\D/g,
+                                                                    ""
+                                                                )
+                                                                .slice(0, 5)
                                                         )
                                                     }
-                                                    type="number"
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    autoComplete="postal-code"
+                                                    maxLength={5}
                                                     className="p-2 bg-gray-100 rounded-md border-gray-300/50 border-[1px] outline-none"
-                                                    placeholder="Ej. 52793"
+                                                    placeholder="Ej. 53100"
                                                 />
                                             </div>
+                                            <ZipCoverageNotice
+                                                zipCode={zipCode}
+                                                subtotal={totalAmount}
+                                            />
                                         </>
                                     )}
                                 </>
@@ -360,7 +396,7 @@ const CartContainer = ({ session }: Props) => {
                                 disabled={
                                     !session?.user ||
                                     (shippingMethod === "domicilio" &&
-                                        !slotAvailable)
+                                        (!slotAvailable || !meetsMinOrder))
                                 }
                                 className="py-3 px-8"
                                 onClick={handleCheckout}
@@ -373,6 +409,14 @@ const CartContainer = ({ session }: Props) => {
                                     pago.
                                 </p>
                             )}
+                            {session?.user &&
+                                shippingMethod === "domicilio" &&
+                                !zone && (
+                                    <p className="text-center text-xs font-medium text-gray-500 -mt-3">
+                                        Ingresa un código postal con cobertura
+                                        para continuar.
+                                    </p>
+                                )}
                         </div>
                     </div>
                 </div>

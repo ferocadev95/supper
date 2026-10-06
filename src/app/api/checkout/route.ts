@@ -10,17 +10,9 @@ import {
     todayISO,
 } from "../../../lib/delivery";
 import { readSlotAvailability } from "../../../server/delivery-slots";
+import { getZoneForZip } from "../../../lib/zones";
 
 export const POST = async (req: NextRequest) => {
-    const allowedZipCodes = [
-        "52930",
-        "52934",
-        "52936",
-        "52937",
-        "52938",
-        "52989",
-        "54578",
-    ];
     // Fecha de compra, en el calendario de CDMX. Antes se calculaba con la
     // zona del servidor, así que un pedido de la noche podía registrarse con
     // la fecha del día siguiente.
@@ -75,13 +67,13 @@ export const POST = async (req: NextRequest) => {
             );
         }
 
-        if (
-            shippingMethod === "domicilio" &&
-            !allowedZipCodes.includes(zipCode)
-        ) {
+        // La zona decide el pedido mínimo; el envío es igual para todas.
+        const zone = getZoneForZip(zipCode);
+
+        if (shippingMethod === "domicilio" && !zone) {
             return NextResponse.json(
                 {
-                    error: "Lo sentimos 😢, el código postal que ha ingresado está fuera de nuestro alcance. Contacta a servicio a cliente para revisar tu caso particular.",
+                    error: "Lo sentimos 😢, el código postal que ha ingresado está fuera de nuestras zonas de entrega. Escríbenos por WhatsApp para revisar tu caso particular.",
                 },
                 { status: 400 }
             );
@@ -157,9 +149,20 @@ export const POST = async (req: NextRequest) => {
 
         // Prices, line items and shipping are recomputed from Sanity — the
         // client's `lines` only carry `_id` + quantities.
-        const { stripeLineItems, shipping } = await resolveOrder(
+        const { stripeLineItems, subtotal, shipping } = await resolveOrder(
             lines as SlimLine[]
         );
+
+        // El mínimo se compara contra el subtotal recalculado en el servidor,
+        // no contra el que mostró el carrito.
+        if (shippingMethod === "domicilio" && zone && subtotal < zone.minOrder) {
+            return NextResponse.json(
+                {
+                    error: `El pedido mínimo en ${zone.label} es de $${zone.minOrder}. Te faltan $${(zone.minOrder - subtotal).toFixed(2)}.`,
+                },
+                { status: 400 }
+            );
+        }
 
         const origin = req.headers.get("origin");
 

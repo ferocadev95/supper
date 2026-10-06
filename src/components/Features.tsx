@@ -6,7 +6,7 @@ import { SiCodefresh } from "react-icons/si";
 export const featuresData = [
     {
         title: "Envío Gratis",
-        description: "En compras mayores a $300 MXN",
+        description: "En compras desde $800 MXN",
         icon: <GoRocket />,
     },
     {

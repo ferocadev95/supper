@@ -1,3 +1,5 @@
+import { whatsappUrl } from "../lib/zones";
+
 // Fuente única de las categorías y marcas de producto. La consumen el schema
 // de Sanity (src/sanity/schemas/products.ts), los filtros del sidebar
 // (src/components/SidebarProducts.tsx) y el buscador (src/lib/search.ts).
@@ -68,6 +70,7 @@ export const navBarList = [
     link: "/productos?categoria=chiles-secos",
   },
   { title: "Todos los Productos", link: "/productos" },
+  { title: "Zonas de Entrega", link: "/zonas-de-entrega" },
 ];
 
 export const footerData = [
@@ -80,6 +83,7 @@ export const footerData = [
         listData: [
           { name: "Categorías", link: "/categorias" },
           { name: "Todos los Productos", link: "/productos" },
+          { name: "Zonas de Entrega", link: "/zonas-de-entrega" },
         ],
       },
     ],
@@ -101,7 +105,7 @@ export const footerData = [
           },
           {
             name: "Contacto",
-            link: "https://wa.me/525610719284",
+            link: whatsappUrl(),
           },
         ],
       },

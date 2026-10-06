@@ -57,7 +57,8 @@ const item = {
     matureQuantity: 0,
     greenQuantity: 0,
     kgQuantity: 2,
-    kgPrice: 30,
+    // 2 kg × (210 − 60) = $300: justo el mínimo de la zona principal.
+    kgPrice: 210,
     pPrice: 0,
     gramsPrice: 0,
     rowprice: 60,
@@ -76,6 +77,17 @@ const renderCart = async () => {
         );
     });
 };
+
+const typeZip = async (zip: string) => {
+    await act(async () => {
+        fireEvent.change(screen.getByLabelText(/ingresa tu código postal/i), {
+            target: { value: zip },
+        });
+    });
+};
+
+const payButton = () =>
+    screen.getByRole("button", { name: /proceder al pago/i });
 
 const dayButton = (iso: string) =>
     screen.getByRole("button", {
@@ -148,6 +160,7 @@ describe("CartContainer: día de entrega", () => {
         vi.stubGlobal("fetch", fetchMock);
 
         await renderCart();
+        await typeZip("53100");
         const dates = getDeliveryDates();
 
         await act(async () => {
@@ -190,6 +203,7 @@ describe("CartContainer: día de entrega", () => {
 
     it("permite pagar cuando la franja tiene lugar", async () => {
         await renderCart();
+        await typeZip("53100");
 
         expect(screen.getByText(/horario disponible/i)).toBeInTheDocument();
         expect(
@@ -204,5 +218,42 @@ describe("CartContainer: día de entrega", () => {
         expect(
             dates.filter((date) => dayButton(date)).length
         ).toBe(MAX_BUSINESS_DAYS_AHEAD);
+    });
+});
+
+describe("CartContainer: zonas de entrega", () => {
+    it("no deja pagar sin un código postal con cobertura", async () => {
+        await renderCart();
+        expect(payButton()).toBeDisabled();
+    });
+
+    it("zona principal con el mínimo alcanzado: avisa la zona y deja pagar", async () => {
+        await renderCart();
+        await typeZip("53100");
+
+        expect(screen.getByText(/zona principal/i)).toBeInTheDocument();
+        expect(screen.getByText(/envío es gratis/i)).toBeInTheDocument();
+        expect(payButton()).toBeEnabled();
+    });
+
+    it("zona extendida bajo el mínimo de $500: avisa cuánto falta y bloquea el pago", async () => {
+        await renderCart();
+        await typeZip("53227");
+
+        expect(screen.getByText(/zona extendida/i)).toBeInTheDocument();
+        expect(screen.getByText(/te faltan/i)).toBeInTheDocument();
+        expect(payButton()).toBeDisabled();
+    });
+
+    it("sin cobertura: ofrece consultar por WhatsApp", async () => {
+        await renderCart();
+        await typeZip("01000");
+
+        const link = screen.getByRole("link", {
+            name: /consultar por whatsapp/i,
+        });
+        expect(link.getAttribute("href")).toContain("wa.me");
+        expect(link.getAttribute("href")).toContain("01000");
+        expect(payButton()).toBeDisabled();
     });
 });

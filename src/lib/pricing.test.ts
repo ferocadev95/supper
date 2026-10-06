@@ -94,11 +94,11 @@ describe("computeCartTotals (shipping rule)", () => {
         });
     });
 
-    it("charges shipping at exactly the threshold (300 is not > 300)", () => {
-        expect(computeCartTotals([line(300)])).toEqual({
-            subtotal: 300,
+    it("charges shipping just below the threshold", () => {
+        expect(computeCartTotals([line(799)])).toEqual({
+            subtotal: 799,
             shipping: SHIPPING_COST,
-            total: 350,
+            total: 849,
         });
     });
 
@@ -110,11 +110,11 @@ describe("computeCartTotals (shipping rule)", () => {
         });
     });
 
-    it("free shipping above the threshold", () => {
-        expect(computeCartTotals([line(301)])).toEqual({
-            subtotal: 301,
+    it("free shipping at exactly the threshold ($800 o más)", () => {
+        expect(computeCartTotals([line(800)])).toEqual({
+            subtotal: 800,
             shipping: 0,
-            total: 301,
+            total: 800,
         });
     });
 });

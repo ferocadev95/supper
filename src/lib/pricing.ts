@@ -8,7 +8,8 @@ import type { ProductData } from "../../types";
  */
 
 export const SHIPPING_COST = 50;
-export const FREE_SHIPPING_THRESHOLD = 300;
+/** Envío gratis en pedidos de $800 o más (igual para todas las zonas). */
+export const FREE_SHIPPING_THRESHOLD = 800;
 
 /** Límites de una cantidad en kilogramos, compartidos por los campos de kg del
  *  carrito y de la página de producto, y por la revalidación del checkout. */
@@ -125,7 +126,7 @@ export const discountPercent = (price: PriceFields): number => {
     return (rowprice / base) * 100;
 };
 
-/** Subtotal + shipping rule (free over the threshold) + total. */
+/** Subtotal + shipping rule (free at or above the threshold) + total. */
 export const computeCartTotals = (
     lines: CartLine[]
 ): { subtotal: number; shipping: number; total: number } => {
@@ -138,7 +139,7 @@ export const computeCartTotals = (
     // $50 (sólo el envío), que es lo que se mostraba en la página de éxito
     // después de vaciar el carrito.
     const shipping =
-        subtotal <= 0 || subtotal > FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+        subtotal <= 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
     return { subtotal, shipping, total: subtotal + shipping };
 };
 

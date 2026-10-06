@@ -7,6 +7,7 @@ import Layout from "../../components/Layout";
 import { Toaster } from "react-hot-toast";
 import SessionProvider from "../../components/SessionProvider";
 import WhatsAppButton from "../../components/WhatsappButton";
+import { WHATSAPP_NUMBER } from "../../lib/zones";
 import Script from "next/script";
 import { auth } from "../../../auth";
 
@@ -80,7 +81,7 @@ export default async function RootLayout({
                 },
               }}
             />
-            <WhatsAppButton phoneNumber="525610719284" />
+            <WhatsAppButton phoneNumber={WHATSAPP_NUMBER} />
           </Layout>
         </SessionProvider>
       </body>
